@@ -24,10 +24,21 @@
 }
 
 .wide-button {
-  width: 60%;
+  width: 40%;
   margin-top: 20px;
 }
 
 .hide {
   display: none;
+}
+
+.column {
+  display: inline-block;
+}
+
+.col1 {
+  width: 60%;
+}
+.col2 {
+  width: 30%;
 }

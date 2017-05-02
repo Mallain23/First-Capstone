@@ -10,12 +10,11 @@ let state = {
   };
 
   const assignNewPageTokens = (data) => {
-    state = Object.assign({}, state, {
-    nextPageToken: data.nextPageToken,
-    prevPageToken: data.prevPageToken
-  })
-  };
-
+      state = Object.assign({}, state, {
+          nextPageToken: data.nextPageToken,
+          prevPageToken: data.prevPageToken
+      })
+};
 
 const updateStateType = (interestType) => {
 
@@ -58,7 +57,7 @@ const getDataFromYoutubeApi = (searchFor, callback, page) => {
         key: "AIzaSyARf9WqTP8LDmnUhPWkdqLc0YuYBVVOk2M",
         q: searchFor,
         pageToken: page,
-        maxResults: 10
+        maxResults: 5
     };
 
     $.getJSON(youtube_URL, query, callback);
@@ -79,13 +78,14 @@ const displayYouTubeData = (data) => {
     let resultElement = '';
     if (data.items) {
         data.items.forEach(ele => {
-            resultElement += `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="640" height="350" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
+            resultElement += `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
         });
     }
     else {
       resultElement += '<p>No results</p>';
     }
-    $('.youtube-video-results').html(resultElement);
+    assignNewPageTokens(data)
+    $('.youtube-video-results').append(resultElement);
 };
 
 
@@ -95,7 +95,8 @@ const displayTasteDiveData = data => {
     }
     else {
       $(".result-confirmation-page").removeClass("hide");
-      getDataFromYoutubeApi(state.search, displayYouTubeData)
+      getDataFromYoutubeApi(state.search, displayYouTubeData);
+      $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
     }
 
 console.log(data)
@@ -141,10 +142,43 @@ const watchForEmbedClicks = () => {
     })
 }
 
+const watchForMoreClick = () => {
+    $("body").on("click", ".more", event => {
+        getDataFromYoutubeApi(state.search, displayYouTubeData, state.nextPageToken);
+    });
+}
+
+const watchForReturnHomeClick = () => {
+    $(".return-home-button").on("click", event => {
+        $(".search-page").removeClass("hide")
+        $(".results-page").addClass("hide")
+        $(".result-confirmation-page").addClass("hide");
+        $(".no-results-page").addClass("hide");
+        $(".search-field").val("");
+    })
+};
+
+const watchForGoToResultsPageClick = () => {
+    $(".go-to-results-button").on("click", event => {
+        $(".results-page").removeClass("hide")
+        $(".result-confirmation-page").addClass("hide");
+    })
+};
+
+const watchForPrevButtonClick = () => {
+    $(".prev-button").on("click", event  => {
+      $(".results-page").addClass("hide")
+      $(".result-confirmation-page").removeClass("hide");
+    })
+};
+
 const init = () => {
     watchForSearchSubmit();
-    watchForTryAgainClick();
+    watchForReturnHomeClick();
     watchForEmbedClicks();
+    watchForMoreClick();
+    watchForGoToResultsPageClick();
+    watchForPrevButtonClick();
 }
 
 $(init);
