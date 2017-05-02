@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css" media="screen" title="no title" charset="utf-8">
+    <title>More like THAT!</title>
+  </head>
+  <body>
+
+      <div class="search-page">
+          <h2></h3>
+          <div class="page-logo">
+          </div>
+          <form action="#" class="js-search-form">
+                <label for="query">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
+                    <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field" /><br>
+                    <input type="submit" value="Movies" class="search-button" name="1"/>
+                    <input type="submit" value="Shows" class="search-button" name="2"/>
+                    <input type="submit" value="Music" class="search-button" name="3"/>
+                    <input type="submit" value="Books" class="search-button" name="4"/>
+                    <input type="submit" value="Authors" class="search-button" name="5"/>
+                    <input type="submit" value="Games" class="search-button" name="6"/><br>
+                    <input type="submit" value="All" class="search-button wide-button" name="0"/>
+                <!-- <label class="type" for="interest">What type of results are you looking for?</label>
+                  <select name="interest" class='type-of-interest' >
+                          <option value="0" selected>All</option>
+                          <option value="1">Movies</option>
+                          <option value="2">Shows</option>
+                          <option value="3">Music</option>
+                          <option value="4">Books</option>
+                          <option value="5">Authors</option>
+                          <option value="6">Games</option>
+                  </select> -->
+          </form>
+    </div>
+    <div class="no-results-page hide">
+        <h2>Sorry your search term did not return any results! Try redefining your search term!</h2>
+        <button type="button" class="return-home-button">TRY AGAIN!</button>
+    </div>
+
+
+    <div class="result-confirmation-page hide">
+        <div class="info-image"></div>
+            <div class="info-summary"><div>
+            <a href="" class="wiki-link">Link to Wiki</a>
+        <div class="youtube-video-results"></div>
+    </div>
+
+    <div class="results-page hide">
+        <nav>
+          <button type="button" class="prev-button">Back</button> <button type="button" class="Home">Home</button>
+        </nav>
+        <div class="category-filters">
+            <input type="checkbox" name="BOOKS" value="book">
+            <input type="checkbox" name="AUTHORS" value="author">
+            <input type="checkbox" name="MOVIES" value="movie">
+            <input type="checkbox" name="SHOWS" value="show">
+            <input type="checkbox" name="GAMES" value="game">
+            <input type="checkbox" name="ALL" value="null">
+        </div>
+        <div class="results"></div>
+    </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+      <script src="app.js"></script>
+  </body>
+</html>
+
+<!-- <div class="prev-next">
+    <button type="button" class="prev-button">Prev</button>
+    <button type="button" class="next-button">Next</button>
+</div> -->

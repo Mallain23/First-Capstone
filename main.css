@@ -1,0 +1,33 @@
+.page-logo {
+  width: 70%;
+  margin: auto;
+}
+.logo {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 70%;
+}
+
+.search-page, .results-page {
+  text-align: center;
+}
+
+.search-field  {
+  font-size: 15px;
+  width: 300px;
+  margin-bottom: 30px;
+  margin-top: 15px;
+}
+
+.search-button {
+  font-size: 80px;
+}
+
+.wide-button {
+  width: 60%;
+  margin-top: 20px;
+}
+
+.hide {
+  display: none;
+}
