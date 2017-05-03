@@ -80,7 +80,7 @@ const displayYouTubeData = (data) => {
     let resultElement = '';
     if (data.items) {
         data.items.forEach(ele => {
-            resultElement += `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
+            resultElement += `<h3>Youtube Videos for ${state.search}!!</h3><img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
         });
     }
     else {
@@ -93,9 +93,10 @@ const displayYouTubeData = (data) => {
 
 const displayTasteDiveData = data => {
     if (data.Similar.Results.length === 0) {
-        $(".no-results-page").removeClass("hide")
+        $(".no-results").removeClass("hide")
     }
     else {
+      $(".search-page").addClass("hide");
       state.result = data.Similar.Results;
       $(".result-confirmation-page").removeClass("hide");
       getDataFromYoutubeApi(state.search, displayYouTubeData);
@@ -111,70 +112,75 @@ console.log(data)
 };
 
 const renderHtmlToResultsPage = () => {
-    let htmlElement = "";
-    state.result.forEach(ele => {
-        htmlElement += `<p class="reult-thumb">Result Name: ${ele.Name} Type: ${ele.Type}</p><img class="result-thumbs" src="https://pixy.org/images/placeholder.png">`
+    let listOfResultsElement = "";
+    let dataAttrib = 0
+    listOfResultsElement = state.result.map(ele => {
+        dataAttrib++
+        return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
     });
-    $(".result-list").append(htmlElement);
+
+
+    $(".result-list").html(listOfResultsElement);
 }
 
 const reRenderHtmlToResultsPage = data => {
     if (data.Similar.Results.length === 0) {
-        $(".no-results-page").removeClass("hide")
-        $(".results-page").addClass("hide")
+        let noResultsLanguage = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or redfine your search!</p>`
+        $(".no-results-language").html(noResultsLanguage);
+        $(".no-refined-results").removeClass("hide")
+        $(".results-container").addClass("hide")
+
+
     }
     else {
+        $(".no-refined-results").addClass("hide");
+        $(".results-container").removeClass("hide");
         state.result = data.Similar.Results;
-        let htmlElement = "";
-        state.result.forEach(ele => {
-            htmlElement += `<p class="reult-thumb">Result Name: ${ele.Name} Type: ${ele.Type}</p><img class="result-thumbs" src="https://pixy.org/images/placeholder.png">`
+
+        let listOfResultsElement = "";
+        let dataAttrib = 0;
+        listOfResultsElement = state.result.map(ele => {
+            dataAttrib++
+            return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
         });
-        $(".result-list").html(htmlElement)
-        
+
+        $(".result-list").html(listOfResultsElement)
     }
 };
 
-const renderInfoToInfoPage = () => {
-
+const renderInfo = (index) => {
+    let infoHtml = ""
+    infoHtml = `<p>More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more results like ${state.search}!</button>`
+    $(".info-container").html(infoHtml)
 }
-// const renderMoreResults = data => { Need to find out how to render more results
-// state.result = data.Similar.Results
-// console.log(state.result)
-// }
 
 
 const watchForSearchSubmit = () => {
     $('.js-search-form').on("click", ".search-button", event => {
     event.preventDefault();
 
-    $(".search-page").addClass("hide");
-
     let typeOfInterest= $(event.target).val();
     updateStateType(typeOfInterest);
     state.search = $(".search-field").val();
 
     getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
+    $('.youtube-video-results').html("");
     //  getDataFromWikipediaApi(state.search, displayYoutubeSearchData)
   });
 }
 
-const watchForANewSearchSubmit = () => {
+const watchForRefinedSearchSubmit = () => {
       $('.js-new-search-form').on("click", ".search-button", event => {
           event.preventDefault();
+
           let typeOfInterest= $(event.target).val();
+
           updateStateType(typeOfInterest);
-          console.log(state.type)
           getDataFromTasteDiveApi(state.search, state.type, reRenderHtmlToResultsPage)
+          $(window).scrollTop(0)
       })
 }
 
-const watchForTryAgainClick = () => {
-  $(".no-results-page").on("click", ".return-home-button", event => {
-        $(".no-results-page").addClass("hide");
-        $(".search-page").removeClass("hide");
-        $(".search-field").val("");
-  })
-}
 
 const watchForEmbedClicks = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
@@ -200,7 +206,7 @@ const watchForReturnHomeClick = () => {
         $(".search-page").removeClass("hide")
         $(".results-page").addClass("hide")
         $(".result-confirmation-page").addClass("hide");
-        $(".no-results-page").addClass("hide");
+        $(".no-results").addClass("hide");
         $(".search-field").val("");
     })
 };
@@ -208,15 +214,37 @@ const watchForReturnHomeClick = () => {
 const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
         $(".results-page").removeClass("hide")
-        $(".info-container").addClass("hide")
+        // $(".info-container").addClass("hide")
         $(".result-confirmation-page").addClass("hide");
+
         renderHtmlToResultsPage ();
+
+        $(window).scrollTop(0)
     })
 };
 
 const watchForMoreInfoClick = () => {
-  $("")
-}
+     $(".result-list").on("click", ".result-thumbs", event => {
+          $(".result-info-container").removeClass("hide");
+          $(".more-results").addClass("hide");
+          $(".result-thumbs").addClass("hide");
+          $(".results").addClass("hide");
+          $(event.target).removeClass("hide");
+          $(event.target).next(".results").removeClass("hide");
+
+          let indexNum = (parseInt($(event.target).attr("data-index")) -1 );
+          renderInfo(indexNum);
+    })
+ };
+
+const watchForGoBackToResultsClick = () => {
+  $(".info-container").on("click", ".back-to-result-list", event => {
+    $(".more-results").removeClass("hide");
+    $(".result-thumbs").removeClass("hide");
+    $(".results").removeClass("hide");
+    $(".info-container").html("");
+  })
+};
 
 const watchForPrevButtonClick = () => { //need to fix prev button issue on confirmation page
     $(".prev-button").on("click", event  => {
@@ -234,12 +262,14 @@ const watchForPrevButtonClick = () => { //need to fix prev button issue on confi
 
 const init = () => {
     watchForSearchSubmit();
-    watchForANewSearchSubmit();
+    watchForRefinedSearchSubmit();
     watchForReturnHomeClick();
     watchForEmbedClicks();
     watchForMoreYoutubeVideosClick();
     watchForGoToResultsPageClick();
     watchForPrevButtonClick();
+    watchForMoreInfoClick();
+    watchForGoBackToResultsClick();
 }
 
 $(init);

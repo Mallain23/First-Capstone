@@ -7,10 +7,9 @@
   </head>
   <body>
 
+
       <div class="search-page">
           <h2></h3>
-          <div class="page-logo">
-          </div>
           <form action="#" class="js-search-form">
                 <label for="query">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
                     <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field" /><br>
@@ -22,19 +21,17 @@
                     <input type="submit" value="Games" class="search-button" name="6"/><br>
                     <input type="submit" value="All" class="search-button wide-button" name="0"/>
           </form>
+          <div class="no-results hide">
+              <h2>Sorry your search term did not return any results!</h2>
+              <p> Try redefining your search term!<p>
+          </div>
     </div>
 
-
-    <div class="no-results-page hide">
-        <h2>Sorry your search term did not return any results!</h2>
-        <p> Try redefining your search term!<p>
-        <button type="button" class="return-home-button">TRY AGAIN!</button>
-    </div>
 
 
     <div class="result-confirmation-page hide">
       <div class="nav-bar">
-          <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
+         <button type="button" class="return-home-button nav-button">Home</button>
       </div>
         <div class="column col1">
             <div class="image-container">
@@ -52,9 +49,10 @@
     </div>
 
 
+
     <div class="results-page hide">
         <div class="nav-bar">
-            <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
+            <button type="button" class="prev-button nav-button">Go back!</button> <button type="button" class="return-home-button nav-button">Home</button>
         </div>
         <div class="category-filters">
             <form action="#" class="js-new-search-form">
@@ -67,15 +65,20 @@
                   <input type="submit" value="All" class="search-button wide-button"/>
             </form>
         </div>
-        <div class="column col3">
-        <div class="result-list"></div>
-            <button type="button" class="more-results">See More like THAT!</button>
-      </div>
-      <div class="column col4">
-        <div class="info-container"></div>
-      </div>
+        <div class="no-refined-results hide">
+            <h2 class="no-results-language"></h2>
+            <button type="button" class="return-home-button">Start Over!</button>
 
-
+        </div>
+        <div class="results-container">
+            <div class="column col3">
+                  <div class="result-list"></div>
+                  <button type="button" class="more-results">See More like THAT!</button>
+            </div>
+            <div class="column col4">
+                <div class="info-container hide"></div>
+            </div>
+        </div>
     </div>
 
 
