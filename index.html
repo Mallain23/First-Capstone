@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="main.css" media="screen" title="no title" charset="utf-8">
-    <title>More like THAT!</title>
-  </head>
-  <body>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="main.css" media="screen" title="no title" charset="utf-8">
+        <title>More like THAT!</title>
+    </head>
+    <body>
 
-
-      <div class="search-page">
-          <h2></h3>
-          <form action="#" class="js-search-form">
+        <div class="search-page">
+            <h2></h3>
+            <form action="#" class="js-search-form">
                 <label for="query">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
                     <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field" /><br>
                     <input type="submit" value="Movies" class="search-button" name="1"/>
@@ -20,19 +19,18 @@
                     <input type="submit" value="Authors" class="search-button" name="5"/>
                     <input type="submit" value="Games" class="search-button" name="6"/><br>
                     <input type="submit" value="All" class="search-button wide-button" name="0"/>
-          </form>
-          <div class="no-results hide">
-              <h2>Sorry your search term did not return any results!</h2>
-              <p> Try redefining your search term!<p>
+            </form>
+            <div class="no-results hide">
+                <h2>Sorry your search term did not return any results!</h2>
+                <p> Try redefining your search term!<p>
           </div>
-    </div>
-
+      </div>
 
 
     <div class="result-confirmation-page hide">
-      <div class="nav-bar">
-         <button type="button" class="return-home-button nav-button">Home</button>
-      </div>
+        <div class="nav-bar">
+            <button type="button" class="return-home-button nav-button">Home</button>
+        </div>
         <div class="column col1">
             <div class="image-container">
                 <div class="name-of-interest"></div>
@@ -43,8 +41,9 @@
             <button type="button" class="return-home-button">This is NOT what I want more of, let me refine my search! </button>
         </div>
         <div class="column col2">
+            <div class="youtube-heading"></div>
             <div class="youtube-video-results"></div>
-              <button type="button" class="more">See More Videos!</button>
+            <button type="button" class="more">See More Videos!</button>
         </div>
     </div>
 
@@ -56,58 +55,31 @@
         </div>
         <div class="category-filters">
             <form action="#" class="js-new-search-form">
-                  <input type="submit" value="Movies" class="search-button"/>
-                  <input type="submit" value="Shows" class="search-button"/>
-                  <input type="submit" value="Music" class="search-button"/>
-                  <input type="submit" value="Books" class="search-button"/>
-                  <input type="submit" value="Authors" class="search-button"/>
-                  <input type="submit" value="Games" class="search-button" /><br>
-                  <input type="submit" value="All" class="search-button wide-button"/>
+                <input type="submit" value="Movies" class="search-button"/>
+                <input type="submit" value="Shows" class="search-button"/>
+                <input type="submit" value="Music" class="search-button"/>
+                <input type="submit" value="Books" class="search-button"/>
+                <input type="submit" value="Authors" class="search-button"/>
+                <input type="submit" value="Games" class="search-button" /><br>
+                <input type="submit" value="All" class="search-button wide-button"/>
             </form>
         </div>
         <div class="no-refined-results hide">
             <h2 class="no-results-language"></h2>
-            <button type="button" class="return-home-button">Start Over!</button>
-
+            <button type="button" class="return-home-button">Redefine my search!</button>
         </div>
         <div class="results-container">
             <div class="column col3">
-                  <div class="result-list"></div>
-                  <button type="button" class="more-results">See More like THAT!</button>
+                <div class="result-list"></div>
+                <button type="button" class="more-results">See More like THAT!</button>
             </div>
             <div class="column col4">
-                <div class="info-container hide"></div>
+                <div class="info-container"></div>
             </div>
         </div>
     </div>
 
-
-
-
-    <!-- <div class="info-page hide">
-        <div class="nav-bar">
-              <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
-        </div>
-        <div class="column col1">
-            <div class="image-container">
-                <div class="name-of-interest"></div>
-                <img class="info-image" src="">
-            </div>
-            <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
-            <button type="button" class="new-search-button">Hey, like that too!! Can I see MORE like THAT!!!!!</button>
-            <button type="button" class="return-to-results-button">Back to more like your original search!</button>
-        </div>
-        <div class="column col2">
-            <div class="youtube-video-results"></div>
-              <button type="button" class="more">See More Videos!</button>
-        </div>
-    <div> -->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-      <script src="app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
-
-<!-- <div class="prev-next">
-    <button type="button" class="prev-button">Prev</button>
-    <button type="button" class="next-button">Next</button>
-</div> -->

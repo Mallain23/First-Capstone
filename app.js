@@ -10,7 +10,8 @@ let state = {
     prevPage: null
   };
 
-  const assignNewPageTokens = (data) => {
+
+const assignNewPageTokens = (data) => {
       state = Object.assign({}, state, {
           nextPageToken: data.nextPageToken,
           prevPageToken: data.prevPageToken
@@ -18,29 +19,9 @@ let state = {
 };
 
 const updateStateType = (interestType) => {
-
-    if(interestType === "All") {
-        state.type = null
-    }
-    else if(interestType === "Movies") {
-        state.type = "movies"
-    }
-    else if(interestType === "Shows") {
-        state.type = "shows"
-    }
-    else if(interestType === "Music") {
-        state.type = "music"
-    }
-    else if(interestType === "Books") {
-        state.type = "books"
-    }
-    else if(interestType=== "Authors") {
-        state.type = "authors"
-    }
-    else if(interestType === "Games") {
-        state.type = "games"
-    }
+    state.type = interestType === "All" ? null : interestType.toLowerCase();
 };
+
 
 // const getDataFromWikipediaApi = (searchFor, callback) => {
 //   let query = {
@@ -80,13 +61,15 @@ const displayYouTubeData = (data) => {
     let resultElement = '';
     if (data.items) {
         data.items.forEach(ele => {
-            resultElement += `<h3>Youtube Videos for ${state.search}!!</h3><img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
+            resultElement += `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
         });
     }
     else {
       resultElement += '<p>No results</p>';
     }
+
     assignNewPageTokens(data)
+    $('.youtube-heading').html(`Youtube Videos for the search term ${state.search}`)
     $('.youtube-video-results').append(resultElement);
 };
 
@@ -96,102 +79,107 @@ const displayTasteDiveData = data => {
         $(".no-results").removeClass("hide")
     }
     else {
-      $(".search-page").addClass("hide");
-      state.result = data.Similar.Results;
-      $(".result-confirmation-page").removeClass("hide");
-      getDataFromYoutubeApi(state.search, displayYouTubeData);
-      $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
-      $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
-      $(".info-summary").prepend(`${data.Similar.Info[0].wTeaser} `);
-      $(".name-of-interest").text(data.Similar.Info[0].Name)
+        $(".search-page").addClass("hide");
+        state.result = data.Similar.Results;
+        $(".result-confirmation-page").removeClass("hide");
+
+        getDataFromYoutubeApi(state.search, displayYouTubeData);
+        console.log(state.result)
+
+
+        $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
+        $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
+        $(".info-summary").prepend(`${data.Similar.Info[0].wTeaser} `);
+        $(".name-of-interest").text(data.Similar.Info[0].Name)
     };
-
-
 console.log(data)
-
 };
 
-const renderHtmlToResultsPage = () => {
-    let listOfResultsElement = "";
-    let dataAttrib = 0
-    listOfResultsElement = state.result.map(ele => {
-        dataAttrib++
-        return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
-    });
+const renderHtmlToResultsPage = (data) => {
+    if (data) {
+        state.result = data.Similar.Results;
 
-
-    $(".result-list").html(listOfResultsElement);
-}
-
-const reRenderHtmlToResultsPage = data => {
-    if (data.Similar.Results.length === 0) {
-        let noResultsLanguage = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or redfine your search!</p>`
-        $(".no-results-language").html(noResultsLanguage);
-        $(".no-refined-results").removeClass("hide")
-        $(".results-container").addClass("hide")
-
-
-    }
-    else {
         $(".no-refined-results").addClass("hide");
         $(".results-container").removeClass("hide");
-        state.result = data.Similar.Results;
 
         let listOfResultsElement = "";
         let dataAttrib = 0;
+
         listOfResultsElement = state.result.map(ele => {
             dataAttrib++
             return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
         });
 
-        $(".result-list").html(listOfResultsElement)
+        if (listOfResultsElement.length === 0) {
+            listOfResultsElement = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or redfine your search!</p>`
+
+            $(".no-results-language").html(listOfResultsElement);
+            $(".no-refined-results").removeClass("hide");
+            $(".results-container").addClass("hide")
+          }
+        else {
+            $(".result-list").html(listOfResultsElement)
+        }
     }
+    else {
+        let listOfResultsElement = "";
+        let dataAttrib = 0
+
+        listOfResultsElement = state.result.map(ele => {
+            dataAttrib++
+            return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
+        });
+    $(".result-list").html(listOfResultsElement);
+    };
 };
+
 
 const renderInfo = (index) => {
     let infoHtml = ""
-    infoHtml = `<p>More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more results like ${state.search}!</button>`
+    infoHtml = `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button><button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
     $(".info-container").html(infoHtml)
-}
+};
 
 
 const watchForSearchSubmit = () => {
     $('.js-search-form').on("click", ".search-button", event => {
     event.preventDefault();
 
-    let typeOfInterest= $(event.target).val();
+    let typeOfInterest = $(event.target).val();
     updateStateType(typeOfInterest);
+
     state.search = $(".search-field").val();
 
     getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
     $('.youtube-video-results').html("");
-    //  getDataFromWikipediaApi(state.search, displayYoutubeSearchData)
+    //  getDataFromWikipediaApi(state.search, displayYoutubeSearchData) might need this later to get pics from wiki
   });
 }
 
 const watchForRefinedSearchSubmit = () => {
-      $('.js-new-search-form').on("click", ".search-button", event => {
-          event.preventDefault();
+    $('.js-new-search-form').on("click", ".search-button", event => {
+        event.preventDefault();
+        $(".info-container").addClass("hide");
 
-          let typeOfInterest= $(event.target).val();
+        let typeOfInterest= $(event.target).val();
 
-          updateStateType(typeOfInterest);
-          getDataFromTasteDiveApi(state.search, state.type, reRenderHtmlToResultsPage)
-          $(window).scrollTop(0)
-      })
-}
+        updateStateType(typeOfInterest);
+        getDataFromTasteDiveApi(state.search, state.type, renderHtmlToResultsPage)
+        $(window).scrollTop(0)
+    })
+};
 
 
 const watchForEmbedClicks = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
-          $(".iFrame").addClass("hide");
-          $(".thumbs").removeClass("hide");
-          $(event.target).next(".iFrame").removeClass("hide")
-         $(event.target).addClass("hide");
+        $(".iFrame").addClass("hide");
+        $(".thumbs").removeClass("hide");
+        $(event.target).next(".iFrame").removeClass("hide")
+        $(event.target).addClass("hide");
     });
-     $(".youtube-video-results").on("click", ".back", event => {
-             $(".thumbs").removeClass("hide");
-             $(".iFrame").addClass("hide");
+    $(".youtube-video-results").on("click", ".back", event => {
+        $(".thumbs").removeClass("hide");
+        $(".iFrame").addClass("hide");
     })
 }
 
@@ -214,7 +202,7 @@ const watchForReturnHomeClick = () => {
 const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
         $(".results-page").removeClass("hide")
-        // $(".info-container").addClass("hide")
+        $(".info-container").addClass("hide")
         $(".result-confirmation-page").addClass("hide");
 
         renderHtmlToResultsPage ();
@@ -225,7 +213,7 @@ const watchForGoToResultsPageClick = () => {
 
 const watchForMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
-          $(".result-info-container").removeClass("hide");
+          $(".info-container").removeClass("hide");
           $(".more-results").addClass("hide");
           $(".result-thumbs").addClass("hide");
           $(".results").addClass("hide");
@@ -235,15 +223,15 @@ const watchForMoreInfoClick = () => {
           let indexNum = (parseInt($(event.target).attr("data-index")) -1 );
           renderInfo(indexNum);
     })
- };
+};
 
 const watchForGoBackToResultsClick = () => {
-  $(".info-container").on("click", ".back-to-result-list", event => {
-    $(".more-results").removeClass("hide");
-    $(".result-thumbs").removeClass("hide");
-    $(".results").removeClass("hide");
-    $(".info-container").html("");
-  })
+    $(".info-container").on("click", ".back-to-result-list", event => {
+        $(".more-results").removeClass("hide");
+        $(".result-thumbs").removeClass("hide");
+        $(".results").removeClass("hide");
+        $(".info-container").html("");
+    })
 };
 
 const watchForPrevButtonClick = () => { //need to fix prev button issue on confirmation page
@@ -253,12 +241,22 @@ const watchForPrevButtonClick = () => { //need to fix prev button issue on confi
     })
 };
 
+const watchForANewSearchTermClick = ()=> {
+    $(".info-container").on("click", ".find-more-like-new-topic", event => {
+        $(".info-container").addClass("hide");
+
+        let index = $(event.target).closest(".info-container").find(".index-p").attr("data-indexnum")
+        state.search = state.result[index].Name;
+
+        getDataFromTasteDiveApi(state.search, state.result[index].Type, renderHtmlToResultsPage)
+    })
+}
+
+
 // const watchForMoreResultsClick = () => {
 //     $(".more-results").on("click", event => {
 //         getDataFromTasteDiveApi(state.search, state.type, renderMoreResults)
 //     });
-
-
 
 const init = () => {
     watchForSearchSubmit();
@@ -270,6 +268,7 @@ const init = () => {
     watchForPrevButtonClick();
     watchForMoreInfoClick();
     watchForGoBackToResultsClick();
+    watchForANewSearchTermClick();
 }
 
 $(init);
