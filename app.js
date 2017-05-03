@@ -6,6 +6,7 @@ let state = {
     search: null,
     type: null,
     nextPage: null,
+    result: null,
     prevPage: null
   };
 
@@ -68,6 +69,7 @@ const getDataFromTasteDiveApi = (searchFor, searchType, callback) => {
         type: searchType,
         k: "268947-MichaelA-E3LYSMFS",
         q: searchFor,
+        limit: 5,
         info: 1
     };
 
@@ -94,16 +96,51 @@ const displayTasteDiveData = data => {
         $(".no-results-page").removeClass("hide")
     }
     else {
+      state.result = data.Similar.Results;
       $(".result-confirmation-page").removeClass("hide");
       getDataFromYoutubeApi(state.search, displayYouTubeData);
       $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
-    }
+      $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
+      $(".info-summary").prepend(`${data.Similar.Info[0].wTeaser} `);
+      $(".name-of-interest").text(data.Similar.Info[0].Name)
+    };
+
 
 console.log(data)
 
 };
 
+const renderHtmlToResultsPage = () => {
+    let htmlElement = "";
+    state.result.forEach(ele => {
+        htmlElement += `<p class="reult-thumb">Result Name: ${ele.Name} Type: ${ele.Type}</p><img class="result-thumbs" src="https://pixy.org/images/placeholder.png">`
+    });
+    $(".result-list").append(htmlElement);
+}
 
+const reRenderHtmlToResultsPage = data => {
+    if (data.Similar.Results.length === 0) {
+        $(".no-results-page").removeClass("hide")
+        $(".results-page").addClass("hide")
+    }
+    else {
+        state.result = data.Similar.Results;
+        let htmlElement = "";
+        state.result.forEach(ele => {
+            htmlElement += `<p class="reult-thumb">Result Name: ${ele.Name} Type: ${ele.Type}</p><img class="result-thumbs" src="https://pixy.org/images/placeholder.png">`
+        });
+        $(".result-list").html(htmlElement)
+        
+    }
+};
+
+const renderInfoToInfoPage = () => {
+
+}
+// const renderMoreResults = data => { Need to find out how to render more results
+// state.result = data.Similar.Results
+// console.log(state.result)
+// }
 
 
 const watchForSearchSubmit = () => {
@@ -119,6 +156,16 @@ const watchForSearchSubmit = () => {
     getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
     //  getDataFromWikipediaApi(state.search, displayYoutubeSearchData)
   });
+}
+
+const watchForANewSearchSubmit = () => {
+      $('.js-new-search-form').on("click", ".search-button", event => {
+          event.preventDefault();
+          let typeOfInterest= $(event.target).val();
+          updateStateType(typeOfInterest);
+          console.log(state.type)
+          getDataFromTasteDiveApi(state.search, state.type, reRenderHtmlToResultsPage)
+      })
 }
 
 const watchForTryAgainClick = () => {
@@ -142,7 +189,7 @@ const watchForEmbedClicks = () => {
     })
 }
 
-const watchForMoreClick = () => {
+const watchForMoreYoutubeVideosClick = () => {
     $("body").on("click", ".more", event => {
         getDataFromYoutubeApi(state.search, displayYouTubeData, state.nextPageToken);
     });
@@ -161,22 +208,36 @@ const watchForReturnHomeClick = () => {
 const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
         $(".results-page").removeClass("hide")
+        $(".info-container").addClass("hide")
         $(".result-confirmation-page").addClass("hide");
+        renderHtmlToResultsPage ();
     })
 };
 
-const watchForPrevButtonClick = () => {
+const watchForMoreInfoClick = () => {
+  $("")
+}
+
+const watchForPrevButtonClick = () => { //need to fix prev button issue on confirmation page
     $(".prev-button").on("click", event  => {
       $(".results-page").addClass("hide")
       $(".result-confirmation-page").removeClass("hide");
     })
 };
 
+// const watchForMoreResultsClick = () => {
+//     $(".more-results").on("click", event => {
+//         getDataFromTasteDiveApi(state.search, state.type, renderMoreResults)
+//     });
+
+
+
 const init = () => {
     watchForSearchSubmit();
+    watchForANewSearchSubmit();
     watchForReturnHomeClick();
     watchForEmbedClicks();
-    watchForMoreClick();
+    watchForMoreYoutubeVideosClick();
     watchForGoToResultsPageClick();
     watchForPrevButtonClick();
 }

@@ -33,10 +33,15 @@
 
 
     <div class="result-confirmation-page hide">
+      <div class="nav-bar">
+          <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
+      </div>
         <div class="column col1">
-            <div class="info-image"></div>
-            <div class="info-summary"></div>
-            <a href="" class="wiki-link">Link to Wiki</a>
+            <div class="image-container">
+                <div class="name-of-interest"></div>
+                <img class="info-image" src="">
+            </div>
+            <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
             <button type="button" class="go-to-results-button">Yes!! I want MORE like THAT!!!!!</button>
             <button type="button" class="return-home-button">This is NOT what I want more of, let me refine my search! </button>
         </div>
@@ -46,21 +51,54 @@
         </div>
     </div>
 
+
     <div class="results-page hide">
-        <nav>
-          <button type="button" class="prev-button">Back</button> <button type="button" class="return-home-button">Home</button>
-        </nav>
-        <div class="category-filters">
-            <input type="submit" value="Movies" class="search-button" name="1"/>
-            <input type="submit" value="Shows" class="search-button" name="2"/>
-            <input type="submit" value="Music" class="search-button" name="3"/>
-            <input type="submit" value="Books" class="search-button" name="4"/>
-            <input type="submit" value="Authors" class="search-button" name="5"/>
-            <input type="submit" value="Games" class="search-button" name="6"/><br>
-            <input type="submit" value="All" class="search-button wide-button" name="0"/>
+        <div class="nav-bar">
+            <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
         </div>
+        <div class="category-filters">
+            <form action="#" class="js-new-search-form">
+                  <input type="submit" value="Movies" class="search-button"/>
+                  <input type="submit" value="Shows" class="search-button"/>
+                  <input type="submit" value="Music" class="search-button"/>
+                  <input type="submit" value="Books" class="search-button"/>
+                  <input type="submit" value="Authors" class="search-button"/>
+                  <input type="submit" value="Games" class="search-button" /><br>
+                  <input type="submit" value="All" class="search-button wide-button"/>
+            </form>
+        </div>
+        <div class="column col3">
         <div class="result-list"></div>
+            <button type="button" class="more-results">See More like THAT!</button>
+      </div>
+      <div class="column col4">
+        <div class="info-container"></div>
+      </div>
+
+
     </div>
+
+
+
+
+    <!-- <div class="info-page hide">
+        <div class="nav-bar">
+              <button type="button" class="prev-button nav-button">Back</button> <button type="button" class="return-home-button nav-button">Home</button>
+        </div>
+        <div class="column col1">
+            <div class="image-container">
+                <div class="name-of-interest"></div>
+                <img class="info-image" src="">
+            </div>
+            <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
+            <button type="button" class="new-search-button">Hey, like that too!! Can I see MORE like THAT!!!!!</button>
+            <button type="button" class="return-to-results-button">Back to more like your original search!</button>
+        </div>
+        <div class="column col2">
+            <div class="youtube-video-results"></div>
+              <button type="button" class="more">See More Videos!</button>
+        </div>
+    <div> -->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
       <script src="app.js"></script>
   </body>
