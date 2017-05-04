@@ -5,138 +5,170 @@
         <link rel="stylesheet" href="main.css" media="screen" title="no title" charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.css" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Baloo:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Indie+Flower:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister:400,700" rel="stylesheet">
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="grid.css">
         <title>More like THAT!</title>
     </head>
+
+
     <body>
+
 
         <div class="search-page">
             <div class="row">
                 <div class="col-12">
-                    <h1>Welcome to More Like That!</h1>
+                    <h1 class="style-intro">More Like That!</h1>
                 </div>
             </div>
-
-
-                    <form action="#" class="js-search-form">
-                        <label for="query">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
-                <div class="row">
-                    <div class="col-12">
-                        <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field" /><br>
+            <div class="button-container">
+                <form action="#" class="js-search-form">
+                    <label for="query" class="style-label">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
+                        <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field style-search"/><br>
+                        <div class="row-for-buttons">
+                        <div class="button-col">
+                            <button type="submit" value="Movies" class="search-button movie"/>Movies</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Shows" class="search-button show"/>Shows</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Books" class="search-button book"/>Books</button>
+                        </div>
+                        <div class="button-col">
+                              <button type="submit" value="Authors" class="search-button author"/>Authors</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Music" class="search-button music"/>Music</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Games" class="search-button game"/>Games</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row-for-buttons">
-                    <div class="button-col">
-                        <button type="submit" value="Movies" class="search-button movie"/>Movies</button>
+                    <div class="row-for-buttons">
+                        <div class="button-col wide">
+                            <button type="submit" value="All" class="search-button wide-button all"/>All Categories</button>
+                        </div>
                     </div>
-                    <div class="button-col">
-                        <button type="submit" value="Shows" class="search-button show"/>Shows</button>
-                    </div>
-                    <div class="button-col">
-                        <button type="submit" value="Books" class="search-button book"/>Books</button>
-                    </div>
-                    <div class="button-col">
-                          <button type="submit" value="Authors" class="search-button author"/>Authors</button>
-                    </div>
-                    <div class="button-col">
-                        <button type="submit" value="Music" class="search-button music"/>Music</button>
-                    </div>
-                    <div class="button-col">
-                        <button type="submit" value="Games" class="search-button game"/>Games</button>
-                    </div>
-                </div>
-                <div class="row-for-buttons">
-                    <div class="button-col wide">
-                        <button type="submit" value="All" class="search-button wide-button all"/>All</button>
-                    </div>
-                </div>
                 </form>
-            <div class="no-results hide">
-                <h2>Sorry your search term did not return any results!</h2>
-                <p> Try redefining your search term!<p>
+            </div>
+            <div class="no-results hide create-space">
+                    <h2>Sorry your search term did not return any results!</h2>
+                    <p> Try redefining your search term!<p>
+              </div>
           </div>
+
+
+        <div class="result-confirmation-page hide">
+            <div class="category-filters">
+                <form action="#" class="js-search-form">
+                    <div class="row-for-buttons">
+                        <div class="button-col">
+                            <button type="submit" value="Movies" class="search-button smaller movie"/>Movies</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Shows" class="search-button smaller show"/>Shows</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Books" class="search-button smaller book"/>Books</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Authors" class="search-button smaller author"/>Authors</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Music" class="search-button smaller music"/>Music</button>
+                        </div>
+                        <div class="button-col">
+                            <button type="submit" value="Games" class="search-button smaller game"/>Games</button>
+                        </div>
+                    </div>
+                    <div class="row-for-buttons">
+                        <div class="medium-button-col">
+                            <button type="submit" value="All" class="search-button smaller medium-button all"/>All Categories</button>
+                        </div>
+                        <div class="medium-button-col">
+                            <button type="button" class="js-return-home-button return-home-button smaller">Go back</button>
+                        </div>
+                        <div class="medium-button-col">
+                            <button type="button" class="js-return-home-button return-home-button smaller">Home</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="no-results-for-refine style-center"></div>
+            <div class="conf-results-container">
+                <div class="column col1">
+                    <div class="image-container">
+                        <div class="name-of-interest"></div>
+                        <img class="info-image" src="">
+                    </div>
+                        <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
+                          <button type="button" class="go-to-results-button">Yes!! I want MORE like THAT!!!!!</button>
+                          <button type="button" class="js-return-home-button">This is NOT what I want more of, let me refine my search! </button>
+                    </div>
+                <div class="column col2">
+                    <div class="youtube-heading"></div>
+                    <div class="youtube-video-results"></div>
+                    <button type="button" class="more smaller">See More Videos!</button>
+                </div>
+        </div>
       </div>
 
 
-    <div class="result-confirmation-page hide">
-        <div class="nav-bar">
-            <button type="button" class="return-home-button nav-button">Home</button>
-        </div>
-        <div class="column col1">
-            <div class="image-container">
-                <div class="name-of-interest"></div>
-                <img class="info-image" src="">
-            </div>
-            <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
-            <button type="button" class="go-to-results-button">Yes!! I want MORE like THAT!!!!!</button>
-            <button type="button" class="return-home-button">This is NOT what I want more of, let me refine my search! </button>
-        </div>
-        <div class="column col2">
-            <div class="youtube-heading"></div>
-            <div class="youtube-video-results"></div>
-            <button type="button" class="more">See More Videos!</button>
-        </div>
-    </div>
 
-
-
-    <div class="results-page hide">
-        <div class="nav-bar">
-            <button type="button" class="prev-button nav-button">Go back!</button> <button type="button" class="return-home-button nav-button">Home</button>
-        </div>
-        <div class="category-filters">
-            <form action="#" class="js-new-search-form">
-                <label for="query">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
-            <div class="row">
-                <div class="col-12">
-                    <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field" /><br>
+      <div class="results-page hide">
+           <form action="#" class="js-new-search-form">
+            <div class="category-filters">
+                <div class="row-for-buttons">
+                    <div class="button-col">
+                        <button type="submit" value="Movies" class="search-button smaller movie"/>Movies</button>
+                    </div>
+                <div class="button-col">
+                      <button type="submit" value="Shows" class="search-button smaller show"/>Shows</button>
+                </div>
+                <div class="button-col">
+                      <button type="submit" value="Books" class="search-button smaller book"/>Books</button>
+                </div>
+                <div class="button-col">
+                      <button type="submit" value="Authors" class="search-button smaller author"/>Authors</button>
+                </div>
+                <div class="button-col">
+                      <button type="submit" value="Music" class="search-button smaller music"/>Music</button>
+                </div>
+                <div class="button-col">
+                      <button type="submit" value="Games" class="search-button smaller game"/>Games</button>
                 </div>
             </div>
             <div class="row-for-buttons">
-                <div class="button-col">
-                    <button type="submit" value="Movies" class="search-button movie"/>Movies</button>
+                <div class="medium-button-col">
+                      <button type="submit" value="All" class="search-button smaller medium-button all"/>All Categories</button>
                 </div>
-                <div class="button-col">
-                    <button type="submit" value="Shows" class="search-button show"/>Shows</button>
+                <div class="medium-button-col">
+                      <button type="button" class="prev-button smaller">Go back</button>
                 </div>
-                <div class="button-col">
-                    <button type="submit" value="Books" class="search-button book"/>Books</button>
+                <div class="medium-button-col">
+                      <button type="button" class="js-return-home-button return-home-button smaller">Home</button>
                 </div>
-                <div class="button-col">
-                      <button type="submit" value="Authors" class="search-button author"/>Authors</button>
-                </div>
-                <div class="button-col">
-                    <button type="submit" value="Music" class="search-button music"/>Music</button>
-                </div>
-                <div class="button-col">
-                    <button type="submit" value="Games" class="search-button game"/>Games</button>
-                </div>
-            </div>
-            <div class="row-for-buttons">
-                <div class="button-col wide">
-                    <button type="submit" value="All" class="search-button wide-button all"/>All</button>
-                </div>
-            </div>
-            </form>
-        </div>
-        <div class="no-refined-results hide">
-            <h2 class="no-results-language"></h2>
-            <button type="button" class="return-home-button">Redefine my search!</button>
-        </div>
-        <div class="results-container">
-            <div class="column col3">
-                <div class="result-list"></div>
-                <button type="button" class="more-results">See More like THAT!</button>
-            </div>
-            <div class="column col4">
-                <div class="info-container"></div>
-            </div>
-        </div>
-    </div>
+          </div>
+        </form>
+      </div>
+          <div class="no-refined-results hide">
+              <h2 class="no-results-language"></h2>
+          </div>
+          <div class="results-container">
+                <div class="column col3">
+                    <div class="result-list"></div>
+                    <button type="button" class="more-results smaller">See More like THAT!</button>
+              </div>
+              <div class="column col4">
+                  <div class="info-container"></div>
+              </div>
+          </div>
+      </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script src="app.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="app.js"></script>
   </body>
 </html>

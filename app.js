@@ -86,21 +86,27 @@ const displayYouTubeData = (data) => {
 
 const displayTasteDiveData = data => {
     if (data.Similar.Results.length === 0) {
-        $(".no-results").removeClass("hide")
+        $(".no-results-for-refine").removeClass("hide")
+        $(".no-results").removeClass("hide");
+        $(".conf-results-container").addClass("hide")
+
+        let noResultsLanguage = `<h2>Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or click home to redefine your search!</p>`
+        $(".no-results-for-refine").html(noResultsLanguage);
     }
     else {
         $(".search-page").addClass("hide");
-        state.result = data.Similar.Results;
+        $(".no-results-for-refine").addClass("hide");
         $(".result-confirmation-page").removeClass("hide");
+        $(".conf-results-container").removeClass("hide");
 
+        state.result = data.Similar.Results;
         getDataFromYoutubeApi(state.search, displayYouTubeData);
-        console.log(state.result)
-
 
         $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
         $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
         $(".info-summary").prepend(`${data.Similar.Info[0].wTeaser} `);
-        $(".name-of-interest").text(data.Similar.Info[0].Name)
+        $(".name-of-interest").html(`${data.Similar.Info[0].Name.toUpperCase()}<br>Type: ${data.Similar.Info[0].Type.toUpperCase()}`)
+
     };
 console.log(data)
 };
@@ -125,7 +131,7 @@ const renderRefinedResultsToResultsPage = data => {
         $(".no-refined-results").removeClass("hide");
         $(".results-container").addClass("hide")
 
-        let noResultsLanguage = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or redfine your search!</p>`
+        let noResultsLanguage = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or click home to redefine your search!</p>`
         $(".no-results-language").html(noResultsLanguage);
     }
     else {
@@ -144,45 +150,6 @@ const renderRefinedResultsToResultsPage = data => {
     };
 };
 
-// const renderHtmlToResultsPage = data => {
-//     if (data) {
-//         state.result = data.Similar.Results;
-//
-//         $(".no-refined-results").addClass("hide");
-//         $(".results-container").removeClass("hide");
-//
-//         let listOfResultsElement = "";
-//         let dataAttrib = 0;
-//
-//         listOfResultsElement = state.result.map(ele => {
-//             dataAttrib++
-//             return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
-//         });
-//
-//         if (listOfResultsElement.length === 0) {
-//             listOfResultsElement = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or redfine your search!</p>`
-//
-//             $(".no-results-language").html(listOfResultsElement);
-//             $(".no-refined-results").removeClass("hide");
-//             $(".results-container").addClass("hide")
-//           }
-//         else {
-//             $(".result-list").html(listOfResultsElement)
-//         }
-//     }
-//     else {
-//         let listOfResultsElement = "";
-//         let dataAttrib = 0
-//
-//         listOfResultsElement = state.result.map(ele => {
-//             dataAttrib++
-//             return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
-//         });
-//     $(".result-list").html(listOfResultsElement);
-//     };
-// };
-
-
 const renderResultInfo = (index) => {
     let infoHtml = ""
     infoHtml = `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button><button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
@@ -196,7 +163,6 @@ const watchForSearchClick = () => {
 
     let typeOfInterest = $(event.target).val();
     updateStateType(typeOfInterest);
-    console.log(state.type)
 
     state.search = $(".search-field").val();
 
@@ -204,7 +170,7 @@ const watchForSearchClick = () => {
     $('.youtube-video-results').html("");
     getDataFromWikipediaApi(state.search, displayDataFromWiki)
   });
-}
+};
 
 const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
@@ -216,7 +182,7 @@ const watchForRefinedSearchClick = () => {
 
         getDataFromTasteDiveApi(state.search, state.type, renderRefinedResultsToResultsPage)
         $(window).scrollTop(0)
-    })
+    });
 };
 
 const watchForANewSearchClick = ()=> {
@@ -227,8 +193,48 @@ const watchForANewSearchClick = ()=> {
         state.search = state.result[index].Name;
 
         getDataFromTasteDiveApi(state.search, state.result[index].Type, renderRefinedResultsToResultsPage)
-    })
-}
+    });
+};
+
+const watchForGoToResultsPageClick = () => {
+    $(".go-to-results-button").on("click", event => {
+        $(".results-page").removeClass("hide");
+        $(".info-container").addClass("hide");
+        $(".search-container").addClass("hide");
+        $(".result-confirmation-page").addClass("hide");
+
+
+        renderResultsToResultsPage();
+
+        $(window).scrollTop(0)
+    });
+};
+
+const watchForGoBackToResultsClick = () => {
+    $(".info-container").on("click", ".back-to-result-list", event => {
+        $(".more-results").removeClass("hide");
+        $(".result-thumbs").removeClass("hide");
+        $(".results").removeClass("hide");
+        $(".info-container").html("");
+    });
+};
+
+const watchForPrevButtonClick = () => {
+    $(".prev-button").on("click", event  => {
+      $(".results-page").addClass("hide")
+      $(".result-confirmation-page").removeClass("hide");
+    });
+};
+
+const watchForReturnHomeClick = () => {
+    $(".return-home-button").on("click", event => {
+        $(".search-page").removeClass("hide")
+        $(".results-page").addClass("hide")
+        $(".result-confirmation-page").addClass("hide");
+        $(".no-results").addClass("hide");
+        $(".search-field").val("");
+    });
+};
 
 const watchForEmbedClicks = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
@@ -247,28 +253,6 @@ const watchForMoreYoutubeVideosClick = () => {
     $("body").on("click", ".more", event => {
         getDataFromYoutubeApi(state.search, displayYouTubeData, state.nextPageToken);
     });
-}
-
-const watchForReturnHomeClick = () => {
-    $(".return-home-button").on("click", event => {
-        $(".search-page").removeClass("hide")
-        $(".results-page").addClass("hide")
-        $(".result-confirmation-page").addClass("hide");
-        $(".no-results").addClass("hide");
-        $(".search-field").val("");
-    })
-};
-
-const watchForGoToResultsPageClick = () => {
-    $(".go-to-results-button").on("click", event => {
-        $(".results-page").removeClass("hide")
-        $(".info-container").addClass("hide")
-        $(".result-confirmation-page").addClass("hide");
-
-        renderResultsToResultsPage();
-
-        $(window).scrollTop(0)
-    })
 };
 
 const watchForMoreInfoClick = () => {
@@ -282,25 +266,8 @@ const watchForMoreInfoClick = () => {
 
           let indexNum = (parseInt($(event.target).attr("data-index")) -1 );
           renderResultInfo(indexNum);
-    })
+    });
 };
-
-const watchForGoBackToResultsClick = () => {
-    $(".info-container").on("click", ".back-to-result-list", event => {
-        $(".more-results").removeClass("hide");
-        $(".result-thumbs").removeClass("hide");
-        $(".results").removeClass("hide");
-        $(".info-container").html("");
-    })
-};
-
-const watchForPrevButtonClick = () => {
-    $(".prev-button").on("click", event  => {
-      $(".results-page").addClass("hide")
-      $(".result-confirmation-page").removeClass("hide");
-    })
-};
-
 
 
 // const watchForMoreResultsClick = () => {
