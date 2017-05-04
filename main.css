@@ -1,12 +1,4 @@
-.page-logo {
-  width: 70%;
-  margin: auto;
-}
-.logo {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  width: 70%;
-}
+
 
 .search-page, .results-page {
   text-align: center;
@@ -19,14 +11,30 @@
   margin-top: 15px;
 }
 
-.search-button {
-  font-size: 80px;
+.row-for-buttons {
+  padding: 0px;
 }
 
-.wide-button {
-  width: 40%;
-  margin-top: 20px;
+.search-button {
+  font-size: 45px;
+ width: 100%;
+  /*-webkit-transition-duration: 0.8s; /* Safari */*/
+  transition-duration: 5s;
+
+  border: 1px solid black;
 }
+
+.search-button:hover {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+
+.wide-button {
+  width: 100%;
+}
+
 
 .hide {
   display: none;

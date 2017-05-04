@@ -1,6 +1,6 @@
 const tasteDiveURL = "https://tastedive.com/api/similar?callback=?"
 const youtube_URL = "https://www.googleapis.com/youtube/v3/search?callback=?"
-const wikipediaURL = "https://en.wikipedia.org/w/api.php"
+const wikipediaURL = "https://en.wikipedia.org/w/api.php?callback=?"
 
 let state = {
     search: null,
@@ -21,17 +21,28 @@ const assignNewPageTokens = (data) => {
 const updateStateType = (interestType) => {
     state.type = interestType === "All" ? null : interestType.toLowerCase();
 };
+// let settings = {
+//    url: wikipediaURL,
+//    data: {
+//      action: "query",
+//      titles: searchFor,
+//      prop: "images"
+//    },
+//    dataType: 'json',
+//    type: 'GET',
+//    success: callback
+//  };
+//  $.ajax(settings)
 
+const getDataFromWikipediaApi = (searchFor, callback) => {
+    let query = {
+        action: "query",
+        titles: searchFor,
+        prop: "images"
+  };
+  $.getJSON(wikipediaURL, query, callback);
+};
 
-// const getDataFromWikipediaApi = (searchFor, callback) => {
-//   let query = {
-//     action: "query",
-//     titles: searchFor,
-//     headers: { "Api-user-agent": "mallain23"},
-//     prop: "images"
-//   };
-//   $.getJSON(wikipediaURL, query, callback);
-// };
 
 const getDataFromYoutubeApi = (searchFor, callback, page) => {
     let query = {
@@ -69,7 +80,7 @@ const displayYouTubeData = (data) => {
     }
 
     assignNewPageTokens(data)
-    $('.youtube-heading').html(`Youtube Videos for the search term ${state.search}`)
+    $('.youtube-heading').html(`Youtube Videos for the search term "${state.search}"`)
     $('.youtube-video-results').append(resultElement);
 };
 
@@ -94,6 +105,10 @@ const displayTasteDiveData = data => {
     };
 console.log(data)
 };
+
+const displayDataFromWiki = data => {
+  console.log("wiki", data)
+}
 
 const renderHtmlToResultsPage = (data) => {
     if (data) {
@@ -152,7 +167,7 @@ const watchForSearchSubmit = () => {
 
     getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
     $('.youtube-video-results').html("");
-    //  getDataFromWikipediaApi(state.search, displayYoutubeSearchData) might need this later to get pics from wiki
+    getDataFromWikipediaApi(state.search, displayDataFromWiki)
   });
 }
 
@@ -234,7 +249,7 @@ const watchForGoBackToResultsClick = () => {
     })
 };
 
-const watchForPrevButtonClick = () => { //need to fix prev button issue on confirmation page
+const watchForPrevButtonClick = () => {
     $(".prev-button").on("click", event  => {
       $(".results-page").addClass("hide")
       $(".result-confirmation-page").removeClass("hide");
@@ -251,7 +266,6 @@ const watchForANewSearchTermClick = ()=> {
         getDataFromTasteDiveApi(state.search, state.result[index].Type, renderHtmlToResultsPage)
     })
 }
-
 
 // const watchForMoreResultsClick = () => {
 //     $(".more-results").on("click", event => {
