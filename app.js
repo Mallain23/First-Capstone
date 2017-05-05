@@ -10,18 +10,18 @@ const ApiKeys = {
 };
 
 const all = "All";
-// combine urls into one object first letter of Object is caps, properties all caps, sep by underscore if space
-//make an object of your keys, limits const object (API KEYS object, youbtube property)
-// strings used in code, define as const at top
+
+let sliceIndex = 5;
 
 let state = {
-      search: null,
+      searchQuery: null,
       type: null,
       nextPage: null,
       result: null,
       prevPage: null
   };
 
+let pagination = [null];
 
 const assignNewPageTokens = (data) => {
       state = Object.assign({}, state, {
@@ -39,7 +39,7 @@ const getDataFromWikipediaApi = (searchFor, callback) => {
         action: "query",
         titles: searchFor,
         format: "json",
-        prop: "images"
+        prop: "pageimages"
   };
   $.getJSON(Urls.WIKIPEDIA, query, callback);
 };
@@ -81,9 +81,8 @@ const getFormatedHtmlForYouTubeResults = ele => {
 }
 
 const displayYouTubeData = data => {
-    assignNewPageTokens(data)
-    console.log("woops")
-    $('.youtube-heading').html(`Youtube Videos for the search term "${state.search}"`)
+    assignNewPageTokens(data);
+    $('.youtube-heading').html(`Youtube Videos for the search term "${state.searchQuery}"`)
 
     if (data.items) {
         const resultElements = data.items.map(ele => {
@@ -98,7 +97,7 @@ const displayYouTubeData = data => {
 
 const updateNoResultLanguage = (span1, span2) => {
   span1.text(state.type.toUpperCase());
-  span2.text(state.search.toUpperCase());
+  span2.text(state.searchQuery.toUpperCase());
 };
 
 const displayNoResultsInConfPage = ()=> {
@@ -130,26 +129,45 @@ const displayTasteDiveData = data => {
     }
     else {
         state.result = data.Similar.Results;
+        pagination = data.Similar.Results;
+
         displayResultsInConfPage();
         displayInfoInResultsPage(data);
     };
 console.log(data)
-console.log(state.type);
+
 };
 
-
-// one or two more features
 const displayDataFromWiki = data => {
   console.log("wiki", data)
 }
 
 const renderResultsToResultsPage = () => {
-    const listOfResultsElement = state.result.map((ele, index) => {
+    let resultArray = state.result.slice(0, 5);
+    const listOfResultsElement = resultArray.map((ele, index) => {
         return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${index}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
     });
     $(".result-list").html(listOfResultsElement);
 };
 
+
+const renderMoreResultsToResultsPage = () => {
+    let resultArray = state.result.slice(sliceIndex, sliceIndex + 5);
+    if (!resultArray.length) {
+        $(".result-list").append("<h3>Sorry, no additional results</h3>");
+        $(".more-results").addClass("hide");
+    }
+    else {
+        const listOfResultsElement = resultArray.map(ele => {
+            sliceIndex++
+            return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${sliceIndex - 1}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
+      });
+
+  $(window).scrollTop(0)
+  $(".result-list").html(listOfResultsElement);
+}
+
+};
 
 const renderRefinedResultsToResultsPage = data => {
     if (!data.Similar.Results.length) {
@@ -164,17 +182,21 @@ const renderRefinedResultsToResultsPage = data => {
 
         state.result = data.Similar.Results;
         renderResultsToResultsPage();
-    //     //call renderResultsToResultsPage
-    //     listOfResultsElement = state.result.map(ele => {
-    //         dataAttrib++
-    //         return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
-    //     });
-    //     $(".result-list").html(listOfResultsElement)
      };
 };
 
+const formatedResultInfoHtml = index => {
+    return `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br>
+          <p>${state.result[index].wTeaser}
+              <a href="${state.result[index]}">Read More</a>
+              <div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br>
+              <button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button>
+              <button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
+};
+
+
 const renderResultInfo = index => {
-    const infoHtml = `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button><button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
+    const infoHtml = formatedResultInfoHtml(index);
     $(".info-container").html(infoHtml)
 };
 
@@ -185,12 +207,13 @@ const watchForSearchClick = () => {
 
         let typeOfInterest = $(event.target).val();
         updateStateType(typeOfInterest);
+        sliceIndex = 5;
 
-        state.search = $(".search-field").val();  //change to state.searchQuery - more descript
+        state.searchQuery = $(".search-field").val();  //change to state.searchQuery - more descript
 
-        getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
-        getDataFromYoutubeApi(state.search, displayYouTubeData)
-        getDataFromWikipediaApi(state.search, displayDataFromWiki)
+        getDataFromTasteDiveApi(state.searchQuery, state.type, displayTasteDiveData);
+        getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
+        getDataFromWikipediaApi(state.searchQuery, displayDataFromWiki)
 
         $('.youtube-video-results').html("");
       });
@@ -200,11 +223,14 @@ const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
         $(".info-container").addClass("hide");
+        $(".more-results").removeClass("hide");
+        console.log("SFDsfsfsd")
 
         let typeOfInterest= $(event.target).val();
         updateStateType(typeOfInterest);
+        sliceIndex = 5;
 
-        getDataFromTasteDiveApi(state.search, state.type, renderRefinedResultsToResultsPage)
+        getDataFromTasteDiveApi(state.searchQuery, state.type, renderRefinedResultsToResultsPage)
         $(window).scrollTop(0)
     });
 };
@@ -212,14 +238,15 @@ const watchForRefinedSearchClick = () => {
 const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
         $(".info-container").addClass("hide");
+        $(".more-results").removeClass("hide");
 
+        sliceIndex = 5;
         let index = $(event.target).closest(".info-container")
                                    .find(".index-p")
                                    .attr("data-indexnum")
 
-        state.search = state.result[index].Name;
-
-        getDataFromTasteDiveApi(state.search, state.result[index].Type, renderRefinedResultsToResultsPage)
+        state.searchQuery = state.result[index].Name;
+        getDataFromTasteDiveApi(state.searchQuery, state.result[index].Type, renderRefinedResultsToResultsPage)
     });
 };
 
@@ -229,7 +256,6 @@ const watchForGoToResultsPageClick = () => {
         $(".info-container").addClass("hide");
         $(".search-container").addClass("hide");
         $(".result-confirmation-page").addClass("hide");
-
 
         renderResultsToResultsPage();
 
@@ -263,24 +289,25 @@ const watchForReturnHomeClick = () => {
     });
 };
 
-const watchForEmbedClicks = () => {
+const watchForEmbedClick = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
         $(".iFrame").addClass("hide");
         $(".thumbs").removeClass("hide");
         $(event.target).next(".iFrame").removeClass("hide")
         $(event.target).addClass("hide");
     });
+};
+
+const watchForGoBackFromEmbedClick = () => {
     $(".youtube-video-results").on("click", ".back", event => {
         $(".thumbs").removeClass("hide");
         $(".iFrame").addClass("hide");
-    })
-}
-//seperate into two functions
-
+    });
+};
 
 const watchForMoreYoutubeVideosClick = () => {
     $("body").on("click", ".more", event => {
-        getDataFromYoutubeApi(state.search, displayYouTubeData, state.nextPageToken);
+        getDataFromYoutubeApi(state.searchQuery, displayYouTubeData, state.nextPageToken);
     });
 };
 
@@ -293,17 +320,18 @@ const watchForMoreInfoClick = () => {
           $(event.target).removeClass("hide");
           $(event.target).next(".results").removeClass("hide");
 
-          let indexNum = (parseInt($(event.target).attr("data-index")) - 1);
+          let indexNum = (parseInt($(event.target).attr("data-index")));
+          console.log("index", indexNum)
           renderResultInfo(indexNum);
     });
 };
 
-
-// const watchForMoreResultsClick = () => {
-//     $(".more-results").on("click", event => {
-//         getDataFromTasteDiveApi(state.search, state.type, renderMoreResults)
-//     });
-
+const watchForMoreResultsClick = () => {
+    $(".more-results").on("click", event => {
+        renderMoreResultsToResultsPage();
+        console.log(state.result);
+    });
+}
 const init = () => {
     watchForSearchClick();
     watchForRefinedSearchClick();
@@ -314,10 +342,12 @@ const init = () => {
     watchForReturnHomeClick();
     watchForPrevButtonClick();
 
-    watchForEmbedClicks();
+    watchForEmbedClick();
+    watchForGoBackFromEmbedClick();
     watchForMoreYoutubeVideosClick();
 
     watchForMoreInfoClick();
+    watchForMoreResultsClick();
 }
 
 $(init);
