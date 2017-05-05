@@ -1,13 +1,25 @@
-const tasteDiveURL = "https://tastedive.com/api/similar?callback=?"
-const youtube_URL = "https://www.googleapis.com/youtube/v3/search?callback=?"
-const wikipediaURL = "https://en.wikipedia.org/w/api.php?callback=?"
+const Urls = {
+  TASTEDIVE: "https://tastedive.com/api/similar?callback=?",
+  YOUTUBE: "https://www.googleapis.com/youtube/v3/search?callback=?",
+  WIKIPEDIA: "https://en.wikipedia.org/w/api.php?callback=?"
+};
+
+const ApiKeys = {
+  YOUTUBE: "AIzaSyARf9WqTP8LDmnUhPWkdqLc0YuYBVVOk2M",
+  TASTEDIVE: "268947-MichaelA-E3LYSMFS"
+};
+
+const all = "All";
+// combine urls into one object first letter of Object is caps, properties all caps, sep by underscore if space
+//make an object of your keys, limits const object (API KEYS object, youbtube property)
+// strings used in code, define as const at top
 
 let state = {
-    search: null,
-    type: null,
-    nextPage: null,
-    result: null,
-    prevPage: null
+      search: null,
+      type: null,
+      nextPage: null,
+      result: null,
+      prevPage: null
   };
 
 
@@ -19,157 +31,169 @@ const assignNewPageTokens = (data) => {
 };
 
 const updateStateType = (interestType) => {
-    state.type = interestType === "All" ? null : interestType.toLowerCase();
+    state.type = interestType === all ? null : interestType.toLowerCase();
 };
-// let settings = {
-//    url: wikipediaURL,
-//    data: {
-//      action: "query",
-//      titles: searchFor,
-//      prop: "images"
-//    },
-//    dataType: 'json',
-//    type: 'GET',
-//    success: callback
-//  };
-//  $.ajax(settings)
 
 const getDataFromWikipediaApi = (searchFor, callback) => {
     let query = {
         action: "query",
         titles: searchFor,
+        format: "json",
         prop: "images"
   };
-  $.getJSON(wikipediaURL, query, callback);
+  $.getJSON(Urls.WIKIPEDIA, query, callback);
 };
 
 
 const getDataFromYoutubeApi = (searchFor, callback, page) => {
     let query = {
         part: "snippet",
-        key: "AIzaSyARf9WqTP8LDmnUhPWkdqLc0YuYBVVOk2M",
+        key:  ApiKeys.YOUTUBE,
         q: searchFor,
         pageToken: page,
         maxResults: 5
     };
 
-    $.getJSON(youtube_URL, query, callback);
+    $.getJSON(Urls.YOUTUBE, query, callback);
 };
 
 const getDataFromTasteDiveApi = (searchFor, searchType, callback) => {
     let query = {
         type: searchType,
-        k: "268947-MichaelA-E3LYSMFS",
+        k: ApiKeys.TASTEDIVE,
         q: searchFor,
-        limit: 5,
+        limit: 100,
         info: 1
     };
 
-    $.getJSON(tasteDiveURL, query, callback);
+    $.getJSON(Urls.TASTEDIVE, query, callback);
 };
 
-const displayYouTubeData = (data) => {
-    let resultElement = '';
+const getFormatedHtmlForYouTubeResults = ele => {
+  return `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
+              <div class="iFrame hide">
+                  <iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
+                  <button type="button" class="back">Back</button>
+              </div>
+              <p class="channel">
+                  <a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a>
+              </p>`;
+}
+
+const displayYouTubeData = data => {
+    assignNewPageTokens(data)
+    console.log("woops")
+    $('.youtube-heading').html(`Youtube Videos for the search term "${state.search}"`)
+
     if (data.items) {
-        data.items.forEach(ele => {
-            resultElement += `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}"><div class="iFrame hide"><iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back">Back</button></div><p class="channel"><a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a></p>`;
+        const resultElements = data.items.map(ele => {
+            return getFormatedHtmlForYouTubeResults(ele)
         });
+    $('.youtube-video-results').append(resultElements);
     }
     else {
-      resultElement += '<p>No results</p>';
+    $('.youtube-video-results').append("No Results");
     }
-    assignNewPageTokens(data)
-    $('.youtube-heading').html(`Youtube Videos for the search term "${state.search}"`)
-    $('.youtube-video-results').append(resultElement);
 };
 
+const updateNoResultLanguage = (span1, span2) => {
+  span1.text(state.type.toUpperCase());
+  span2.text(state.search.toUpperCase());
+};
+
+const displayNoResultsInConfPage = ()=> {
+      $(".no-results-for-refine").removeClass("hide")
+      $(".no-results").removeClass("hide");
+      $(".conf-results-container").addClass("hide")
+      updateNoResultLanguage($(".no-type-result"), $(".no-term-result"));
+};
+
+const displayResultsInConfPage = () => {
+    $(".search-page").addClass("hide");
+    $(".no-results-for-refine").addClass("hide");
+    $(".result-confirmation-page").removeClass("hide");
+    $(".conf-results-container").removeClass("hide");
+};
+
+const displayInfoInResultsPage = data => {
+    const { wUrl, wTeaser, Name, Type } = data.Similar.Info[0]
+    $(".wiki-link").attr("href", wUrl);
+    $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
+    $(".info-summary").prepend(`${wTeaser} `);
+    $(".name-of-interest").text(Name.toUpperCase());
+    $(".type-of-interest").text(Type.toUpperCase());
+};
 
 const displayTasteDiveData = data => {
-    if (data.Similar.Results.length === 0) {
-        $(".no-results-for-refine").removeClass("hide")
-        $(".no-results").removeClass("hide");
-        $(".conf-results-container").addClass("hide")
-
-        let noResultsLanguage = `<h2>Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or click home to redefine your search!</p>`
-        $(".no-results-for-refine").html(noResultsLanguage);
+    if (!data.Similar.Results.length) {
+        displayNoResultsInConfPage();
     }
     else {
-        $(".search-page").addClass("hide");
-        $(".no-results-for-refine").addClass("hide");
-        $(".result-confirmation-page").removeClass("hide");
-        $(".conf-results-container").removeClass("hide");
-
         state.result = data.Similar.Results;
-        getDataFromYoutubeApi(state.search, displayYouTubeData);
-
-        $(".wiki-link").attr("href", data.Similar.Info[0].wUrl);
-        $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
-        $(".info-summary").prepend(`${data.Similar.Info[0].wTeaser} `);
-        $(".name-of-interest").html(`${data.Similar.Info[0].Name.toUpperCase()}<br>Type: ${data.Similar.Info[0].Type.toUpperCase()}`)
-
+        displayResultsInConfPage();
+        displayInfoInResultsPage(data);
     };
 console.log(data)
+console.log(state.type);
 };
 
+
+// one or two more features
 const displayDataFromWiki = data => {
   console.log("wiki", data)
 }
 
 const renderResultsToResultsPage = () => {
-    let listOfResultsElement = "";
-    let dataAttrib = 0
-
-    listOfResultsElement = state.result.map(ele => {
-        dataAttrib++
-        return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
+    const listOfResultsElement = state.result.map((ele, index) => {
+        return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${index}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
     });
     $(".result-list").html(listOfResultsElement);
 };
 
+
 const renderRefinedResultsToResultsPage = data => {
-    if (data.Similar.Results.length === 0) {
+    if (!data.Similar.Results.length) {
         $(".no-refined-results").removeClass("hide");
         $(".results-container").addClass("hide")
+        updateNoResultLanguage($(".no-type-result"), $(".no-term-result"))
 
-        let noResultsLanguage = `Sorry, there are no ${state.type.toUpperCase()} for the search term ${state.search.toUpperCase()}! </h2><p>Try a different category or click home to redefine your search!</p>`
-        $(".no-results-language").html(noResultsLanguage);
     }
     else {
         $(".no-refined-results").addClass("hide");
         $(".results-container").removeClass("hide");
 
         state.result = data.Similar.Results;
-        let listOfResultsElement = "";
-        let dataAttrib = 0;
-
-        listOfResultsElement = state.result.map(ele => {
-            dataAttrib++
-            return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
-        });
-        $(".result-list").html(listOfResultsElement)
-    };
+        renderResultsToResultsPage();
+    //     //call renderResultsToResultsPage
+    //     listOfResultsElement = state.result.map(ele => {
+    //         dataAttrib++
+    //         return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${dataAttrib}"><p class="results">Result Name: ${ele.Name.toUpperCase()}<br> Type: ${ele.Type.toUpperCase()}</p>`
+    //     });
+    //     $(".result-list").html(listOfResultsElement)
+     };
 };
 
-const renderResultInfo = (index) => {
-    let infoHtml = ""
-    infoHtml = `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button><button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
+const renderResultInfo = index => {
+    const infoHtml = `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br><p>${state.result[index].wTeaser}<a href="${state.result[index]}">Read More</a><div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br><button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button><button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
     $(".info-container").html(infoHtml)
 };
 
 
 const watchForSearchClick = () => {
     $('.js-search-form').on("click", ".search-button", event => {
-    event.preventDefault();
+        event.preventDefault();
 
-    let typeOfInterest = $(event.target).val();
-    updateStateType(typeOfInterest);
+        let typeOfInterest = $(event.target).val();
+        updateStateType(typeOfInterest);
 
-    state.search = $(".search-field").val();
+        state.search = $(".search-field").val();  //change to state.searchQuery - more descript
 
-    getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
-    $('.youtube-video-results').html("");
-    getDataFromWikipediaApi(state.search, displayDataFromWiki)
-  });
+        getDataFromTasteDiveApi(state.search, state.type, displayTasteDiveData);
+        getDataFromYoutubeApi(state.search, displayYouTubeData)
+        getDataFromWikipediaApi(state.search, displayDataFromWiki)
+
+        $('.youtube-video-results').html("");
+      });
 };
 
 const watchForRefinedSearchClick = () => {
@@ -189,7 +213,10 @@ const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
         $(".info-container").addClass("hide");
 
-        let index = $(event.target).closest(".info-container").find(".index-p").attr("data-indexnum")
+        let index = $(event.target).closest(".info-container")
+                                   .find(".index-p")
+                                   .attr("data-indexnum")
+
         state.search = state.result[index].Name;
 
         getDataFromTasteDiveApi(state.search, state.result[index].Type, renderRefinedResultsToResultsPage)
@@ -248,6 +275,8 @@ const watchForEmbedClicks = () => {
         $(".iFrame").addClass("hide");
     })
 }
+//seperate into two functions
+
 
 const watchForMoreYoutubeVideosClick = () => {
     $("body").on("click", ".more", event => {
@@ -264,7 +293,7 @@ const watchForMoreInfoClick = () => {
           $(event.target).removeClass("hide");
           $(event.target).next(".results").removeClass("hide");
 
-          let indexNum = (parseInt($(event.target).attr("data-index")) -1 );
+          let indexNum = (parseInt($(event.target).attr("data-index")) - 1);
           renderResultInfo(indexNum);
     });
 };
