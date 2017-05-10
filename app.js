@@ -1,7 +1,7 @@
 const Urls = {
   TASTEDIVE: "https://tastedive.com/api/similar?callback=?",
   YOUTUBE: "https://www.googleapis.com/youtube/v3/search?callback=?",
-  WIKIPEDIA: "https://en.wikipedia.org/w/api.php?callback=?"
+  WIKIPEDIA: `https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=`
 };
 
 const ApiKeys = {
@@ -11,17 +11,51 @@ const ApiKeys = {
 
 const all = "All";
 
-let sliceIndex = 5;
+let sliceIndex = 1;
+
+const maxResults = 5;
+
+const tasteDiveQueryLimit = 100;
+
+const classReferences = {
+    no_results_for_refine: ".no-results-for-refine",
+    no_results: ".no-results",
+    conf_results_container: ".conf-results-container",
+    search_page: ".search-page",
+    result_confirmation_page: ".result-confirmation-page",
+    info_container: ".info-container",
+    js_search_form: ".js-search-form",
+    js_new_search_form: ".js-new-search-form",
+    more_results: ".more-results",
+    results_page: ".results-page",
+    search_container: ".search-container",
+    result_thumbs: ".result-thumbs",
+    results: ".results",
+    results_page: ".results-page",
+    iFrame: ".iFrame",
+    thumbs: ".thumbs",
+    resturn_home_button: ".return-home-button",
+    youtube_video_results: ".youtube-video-results",
+    results_container: ".results-container",
+    no_refined_results: ".no-refined-results",
+    result_list: ".result-list"
+};
 
 let state = {
       searchQuery: null,
       type: null,
       nextPage: null,
       result: null,
-      prevPage: null
+      prevPage: null,
+      wikiPicsForResults: [],
+      Result_Info: null
   };
 
-let pagination = [null];
+  const resetState = (typeOfInterest) => {
+      state.wikiPicsForResults = [];
+      state.type = typeOfInterest === all ? null : typeOfInterest.toLowerCase();
+      sliceIndex = 1;
+  };
 
 const assignNewPageTokens = (data) => {
       state = Object.assign({}, state, {
@@ -30,20 +64,24 @@ const assignNewPageTokens = (data) => {
       })
 };
 
-const updateStateType = (interestType) => {
-    state.type = interestType === all ? null : interestType.toLowerCase();
+const addAndRemoveClasses = (addArray, removeArray) => {
+    addArray.forEach(ele => {
+        $(ele).addClass("hide");
+    })
+    removeArray.forEach(ele => {
+        $(ele).removeClass("hide");
+    })
 };
+
 
 const getDataFromWikipediaApi = (searchFor, callback) => {
-    let query = {
-        action: "query",
-        titles: searchFor,
-        format: "json",
-        prop: "pageimages"
-  };
-  $.getJSON(Urls.WIKIPEDIA, query, callback);
-};
-
+$.ajax({
+    url: `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages%7Cpageterms&generator=prefixsearch&redirects=1&formatversion=2&piprop=thumbnail&pithumbsize=250&pilimit=20&wbptterms=description&gpssearch=${searchFor}&gpslimit=20`,
+    method: "GET",
+    dataType: "jsonp",
+    success: callback
+  })
+}
 
 const getDataFromYoutubeApi = (searchFor, callback, page) => {
     let query = {
@@ -51,7 +89,7 @@ const getDataFromYoutubeApi = (searchFor, callback, page) => {
         key:  ApiKeys.YOUTUBE,
         q: searchFor,
         pageToken: page,
-        maxResults: 5
+        maxResults: maxResults
     };
 
     $.getJSON(Urls.YOUTUBE, query, callback);
@@ -62,7 +100,7 @@ const getDataFromTasteDiveApi = (searchFor, searchType, callback) => {
         type: searchType,
         k: ApiKeys.TASTEDIVE,
         q: searchFor,
-        limit: 100,
+        limit: tasteDiveQueryLimit,
         info: 1
     };
 
@@ -70,194 +108,252 @@ const getDataFromTasteDiveApi = (searchFor, searchType, callback) => {
 };
 
 const getFormatedHtmlForYouTubeResults = ele => {
-  return `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
-              <div class="iFrame hide">
-                  <iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
-                  <button type="button" class="back">Back</button>
-              </div>
-              <p class="channel">
-                  <a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a>
-              </p>`;
+    return (
+          `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
+           <div class="iFrame hide">
+              <iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
+              <button type="button" class="back">Back</button>
+           </div>
+           <p class="channel">
+              <a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a>
+           </p>`
+    );
 }
 
 const displayYouTubeData = data => {
     assignNewPageTokens(data);
     $('.youtube-heading').html(`Youtube Videos for the search term "${state.searchQuery}"`)
 
-    if (data.items) {
-        const resultElements = data.items.map(ele => {
-            return getFormatedHtmlForYouTubeResults(ele)
-        });
+    if (!data.items) {
+        $('.youtube-video-results').append("No Results");
+        return;
+    }
+
+    const resultElements = data.items.map(ele => getFormatedHtmlForYouTubeResults(ele));
     $('.youtube-video-results').append(resultElements);
-    }
-    else {
-    $('.youtube-video-results').append("No Results");
-    }
 };
+
 
 const updateNoResultLanguage = (span1, span2) => {
   span1.text(state.type.toUpperCase());
   span2.text(state.searchQuery.toUpperCase());
 };
 
-const displayNoResultsInConfPage = ()=> {
-      $(".no-results-for-refine").removeClass("hide")
-      $(".no-results").removeClass("hide");
-      $(".conf-results-container").addClass("hide")
+const storeWikiThumbnails = data => {
+    state.confirmationpage_wiki_info = data.query.pages.sort((a, b) => {
+        return a.index - b.index
+  })
+};
+
+
+const displayNoResultsInConfirmationPage = () => {
+      addRemoveClasses([classReferences.conf_results_container], [classReferences.no_results_for_refine, classReferences.no_results]);
       updateNoResultLanguage($(".no-type-result"), $(".no-term-result"));
 };
 
-const displayResultsInConfPage = () => {
-    $(".search-page").addClass("hide");
-    $(".no-results-for-refine").addClass("hide");
-    $(".result-confirmation-page").removeClass("hide");
-    $(".conf-results-container").removeClass("hide");
-};
+// const displayResultsInConfPage = () => {
+//     addAndRemoveClasses([classReferences.search_page, classReferences.no_results_for_refine], [classReferences.result_confirmation_page, classReferences.conf_results_container])
+// };
 
-const displayInfoInResultsPage = data => {
+const displayInfoInConfirmationPage = data => {
     const { wUrl, wTeaser, Name, Type } = data.Similar.Info[0]
     $(".wiki-link").attr("href", wUrl);
-    $(".info-image").attr("src", "https://pixy.org/images/placeholder.png")
+
+    if (state.confirmationpage_wiki_info[0].hasOwnProperty("thumbnail")) {
+          $(".info-image").attr("src", `${state.confirmationpage_wiki_info[0].thumbnail.source}`)
+    }
+    else {
+      $(".info-image").attr("src", "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRtehRUbA2IoixzvtZaGM2ZWLZbNHYaFjH77t_1aS3cleGTQxEwM-ZmiA")
+    }
     $(".info-summary").prepend(`${wTeaser} `);
     $(".name-of-interest").text(Name.toUpperCase());
     $(".type-of-interest").text(Type.toUpperCase());
+    addAndRemoveClasses([classReferences.search_page, classReferences.no_results_for_refine], [classReferences.result_confirmation_page, classReferences.conf_results_container])
 };
 
 const displayTasteDiveData = data => {
     if (!data.Similar.Results.length) {
-        displayNoResultsInConfPage();
+        displayNoResultsInConfimraitonPage();
+        return;
     }
-    else {
-        state.result = data.Similar.Results;
-        pagination = data.Similar.Results;
+    state.result = data.Similar.Results;
 
-        displayResultsInConfPage();
-        displayInfoInResultsPage(data);
-    };
-console.log(data)
-
+    displayInfoInConfirmationPage(data);
 };
 
-const displayDataFromWiki = data => {
-  console.log("wiki", data)
+
+const updateResults = (ele, index) => {
+    if(!ele.thumbnail) {
+        return (
+                `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${index}">
+                <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+        );
+    }
+    else {
+        return (
+                `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
+                <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+       );
+    }
+};
+
+const updateForMoreResults = (ele, index, sliceIndex) => {
+    if(!ele.thumbnail) {
+          return (
+                  `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
+                  <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+         );
+    }
+    else {
+          return (
+                  `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
+                  <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+         );
+    }
+};
+
+
+const storeWikiPicsForResults = data => {
+    state.wikiPicsForResults.push(data.query.pages.sort((a, b) => a.index - b.index)[0])
+    renderResultsToResultsPage();
+};
+
+const makeASecondCallToWiki = () => {
+    let arrayOfSearchTerms = state.result.map(ele => ele.Name);
+    arrayOfSearchTerms.forEach(ele => getDataFromWikipediaApi(ele, storeWikiPicsForResults));
+};
+
+const renderResults = listOfResultsElement => {
+    $(window).scrollTop(0)
+
+    $(".result-list").html(listOfResultsElement);
+    $(".page-number").text(`Page: ${sliceIndex}`);
 }
 
 const renderResultsToResultsPage = () => {
-    let resultArray = state.result.slice(0, 5);
-    const listOfResultsElement = resultArray.map((ele, index) => {
-        return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${index}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
-    });
-    $(".result-list").html(listOfResultsElement);
-};
+    let resultArray = state.wikiPicsForResults.slice(0, 5);
 
+    const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index));
+
+    addAndRemoveClasses([classReferences.no_refined_results], [classReferences.results_container]);
+    renderResults(listOfResultsElement);
+};
 
 const renderMoreResultsToResultsPage = () => {
-    let resultArray = state.result.slice(sliceIndex, sliceIndex + 5);
+    let resultArray = state.wikiPicsForResults.slice((sliceIndex * 5), (sliceIndex * 5) + 5);
+
     if (!resultArray.length) {
         $(".result-list").append("<h3>Sorry, no additional results</h3>");
-        $(".more-results").addClass("hide");
+        addAndRemoveClasses([classReferences.more_results]);
     }
     else {
-        const listOfResultsElement = resultArray.map(ele => {
-            sliceIndex++
-            return `<img class="result-thumbs" src="https://pixy.org/images/placeholder.png" data-index="${sliceIndex - 1}"><p class="results">Result Name: ${ele.Name.toUpperCase()} <br> Type: ${ele.Type.toUpperCase()}</p>`
-      });
+        const listOfResultsElement = resultArray.map((ele, index) => {
+            return updateForMoreResults(ele, index, sliceIndex)
+        });
 
-  $(window).scrollTop(0)
-  $(".result-list").html(listOfResultsElement);
-}
+        sliceIndex++;
+        renderResults(listOfResultsElement);
 
+        $(".go-back-to-prior-page-of-results").removeAttr("disabled")
+    }
 };
 
-const renderRefinedResultsToResultsPage = data => {
+const renderPriorPageOfResults = () => {
+    sliceIndex = sliceIndex - 2;
+    let resultArray = state.wikiPicsForResults.slice((sliceIndex * 5), (sliceIndex * 5) + 5);
+    const listOfResultsElement = resultArray.map((ele, index) => {
+          return updateForMoreResults(ele, index, sliceIndex)
+    });
+
+    sliceIndex++;
+    renderResults(listOfResultsElement);
+
+    if (sliceIndex === 1) {
+        $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
+    }
+};
+
+
+const getInfoForRefinedSearch = data => {
     if (!data.Similar.Results.length) {
-        $(".no-refined-results").removeClass("hide");
-        $(".results-container").addClass("hide")
+        addAndRemoveClasses([classReferences.results_container], [classReferences.no_refined_results]);
         updateNoResultLanguage($(".no-type-result"), $(".no-term-result"))
 
     }
     else {
-        $(".no-refined-results").addClass("hide");
-        $(".results-container").removeClass("hide");
-
         state.result = data.Similar.Results;
-        renderResultsToResultsPage();
+        makeASecondCallToWiki();
      };
 };
 
-const formatedResultInfoHtml = index => {
-    return `<p class ="index-p" data-indexnum="${index}">More Info About ${state.result[index].Name}<p><br>
-          <p>${state.result[index].wTeaser}
-              <a href="${state.result[index]}">Read More</a>
-              <div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.result[index].yID}"  frameborder="0" allowfullscreen></iframe><br>
-              <button type="button" class="back-to-result-list">Go back to more like ${state.search}!</button>
-              <button type="button" class="find-more-like-new-topic">Find MORE like ${state.result[index].Name}!</button>`
+const formatedResultInfoHtml = () => {
+    return (
+          `<p class ="index-p" data-indexnum="${state.indexNum}">More Info About ${state.wikiPicsForResults[state.indexNum].title}<p><br>
+          <p>${state.Result_Info.Similar.Info[0].wTeaser}
+              <a href="${state.Result_Info.Similar.Info[0].wUrl}">Read More</a>
+              <div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.Result_Info.Similar.Info[0].yID}"  frameborder="0" allowfullscreen></iframe><br>
+              <button type="button" class="back-to-result-list">Go back to more like ${state.searchQuery}!</button>
+              <button type="button" class="find-more-like-new-topic">Find MORE like ${state.wikiPicsForResults[state.indexNum].title}!</button>`
+            )
 };
 
 
-const renderResultInfo = index => {
-    const infoHtml = formatedResultInfoHtml(index);
-    $(".info-container").html(infoHtml)
-};
-
+const updateStateForResultInfo = data => {
+    state.Result_Info = data;
+    const infoHtml = formatedResultInfoHtml();
+    $(".info-container").html(infoHtml);
+}
 
 const watchForSearchClick = () => {
     $('.js-search-form').on("click", ".search-button", event => {
         event.preventDefault();
 
         let typeOfInterest = $(event.target).val();
-        updateStateType(typeOfInterest);
-        sliceIndex = 5;
+        resetState(typeOfInterest)
 
-        state.searchQuery = $(".search-field").val();  //change to state.searchQuery - more descript
+        state.searchQuery = $(".search-field").val();
 
         getDataFromTasteDiveApi(state.searchQuery, state.type, displayTasteDiveData);
         getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
-        getDataFromWikipediaApi(state.searchQuery, displayDataFromWiki)
+        getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
 
         $('.youtube-video-results').html("");
       });
 };
 
+
 const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
-        $(".info-container").addClass("hide");
-        $(".more-results").removeClass("hide");
-        console.log("SFDsfsfsd")
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results])
 
         let typeOfInterest= $(event.target).val();
-        updateStateType(typeOfInterest);
-        sliceIndex = 5;
+        resetState(typeOfInterest);
 
-        getDataFromTasteDiveApi(state.searchQuery, state.type, renderRefinedResultsToResultsPage)
+        getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
         $(window).scrollTop(0)
     });
 };
 
 const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
-        $(".info-container").addClass("hide");
-        $(".more-results").removeClass("hide");
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results])
 
-        sliceIndex = 5;
+        sliceIndex = 0;
         let index = $(event.target).closest(".info-container")
                                    .find(".index-p")
                                    .attr("data-indexnum")
 
-        state.searchQuery = state.result[index].Name;
-        getDataFromTasteDiveApi(state.searchQuery, state.result[index].Type, renderRefinedResultsToResultsPage)
+        state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
+        state.wikiPicsForResults = [];
+        getDataFromTasteDiveApi(state.searchQuery, state.result[index].Type, getInfoForRefinedSearch)
     });
 };
 
 const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
-        $(".results-page").removeClass("hide");
-        $(".info-container").addClass("hide");
-        $(".search-container").addClass("hide");
-        $(".result-confirmation-page").addClass("hide");
-
-        renderResultsToResultsPage();
+        addAndRemoveClasses([classReferences.results_page,  classReferences.search_container, classReferences.result_confirmation_page], [classReferences.results_page]);
+        makeASecondCallToWiki()
 
         $(window).scrollTop(0)
     });
@@ -265,43 +361,36 @@ const watchForGoToResultsPageClick = () => {
 
 const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
-        $(".more-results").removeClass("hide");
-        $(".result-thumbs").removeClass("hide");
-        $(".results").removeClass("hide");
+        addAndRemoveClasses(["string"], [classReferences.more_results, classReferences.result_thumbs, classReferences.results])
         $(".info-container").html("");
     });
 };
 
 const watchForPrevButtonClick = () => {
     $(".prev-button").on("click", event  => {
-      $(".results-page").addClass("hide")
-      $(".result-confirmation-page").removeClass("hide");
+      addAndRemoveClasses([classReferences.results_page, classReferences.info_container], [classReferences.result_confirmation_page])
     });
 };
 
+
 const watchForReturnHomeClick = () => {
     $(".return-home-button").on("click", event => {
-        $(".search-page").removeClass("hide")
-        $(".results-page").addClass("hide")
-        $(".result-confirmation-page").addClass("hide");
-        $(".no-results").addClass("hide");
+        addAndRemoveClasses([classReferences.results_page, classReferences.result_confirmation_page, classReferences.no_results, classReferences.info_container], [classReferences.search_page])
         $(".search-field").val("");
     });
 };
 
 const watchForEmbedClick = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
-        $(".iFrame").addClass("hide");
-        $(".thumbs").removeClass("hide");
-        $(event.target).next(".iFrame").removeClass("hide")
-        $(event.target).addClass("hide");
+        addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs])
+        $(event.target).next(".iFrame").removeClass("hide");
+        $(event.target).addClass("hide")
     });
 };
 
 const watchForGoBackFromEmbedClick = () => {
     $(".youtube-video-results").on("click", ".back", event => {
-        $(".thumbs").removeClass("hide");
-        $(".iFrame").addClass("hide");
+        addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs])
     });
 };
 
@@ -313,16 +402,13 @@ const watchForMoreYoutubeVideosClick = () => {
 
 const watchForMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
-          $(".info-container").removeClass("hide");
-          $(".more-results").addClass("hide");
-          $(".result-thumbs").addClass("hide");
-          $(".results").addClass("hide");
-          $(event.target).removeClass("hide");
+          addAndRemoveClasses([classReferences.more_results, classReferences.result_thumbs, classReferences.results], [classReferences.info_container, event.target])
           $(event.target).next(".results").removeClass("hide");
 
-          let indexNum = (parseInt($(event.target).attr("data-index")));
-          console.log("index", indexNum)
-          renderResultInfo(indexNum);
+          state.indexNum = (parseInt($(event.target).attr("data-index")));
+          let searchFor = state.wikiPicsForResults[state.indexNum].title;
+
+          getDataFromTasteDiveApi(searchFor, state.type, updateStateForResultInfo)
     });
 };
 
@@ -331,6 +417,12 @@ const watchForMoreResultsClick = () => {
         renderMoreResultsToResultsPage();
         console.log(state.result);
     });
+}
+
+const watchForPriorResultsClick = () => {
+  $(".go-back-to-prior-page-of-results").on("click", event => {
+        renderPriorPageOfResults();
+  })
 }
 const init = () => {
     watchForSearchClick();
@@ -348,6 +440,7 @@ const init = () => {
 
     watchForMoreInfoClick();
     watchForMoreResultsClick();
+    watchForPriorResultsClick()
 }
 
 $(init);
