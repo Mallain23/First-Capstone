@@ -38,6 +38,7 @@ const classReferences = {
     youtube_video_results: ".youtube-video-results",
     results_container: ".results-container",
     no_refined_results: ".no-refined-results",
+    result_buttons: ".result-buttons",
     result_list: ".result-list"
 };
 
@@ -145,15 +146,11 @@ const storeWikiThumbnails = data => {
   })
 };
 
-
 const displayNoResultsInConfirmationPage = () => {
-      addRemoveClasses([classReferences.conf_results_container], [classReferences.no_results_for_refine, classReferences.no_results]);
+      addAndRemoveClasses([classReferences.conf_results_container], [classReferences.no_results_for_refine, classReferences.no_results]);
       updateNoResultLanguage($(".no-type-result"), $(".no-term-result"));
 };
 
-// const displayResultsInConfPage = () => {
-//     addAndRemoveClasses([classReferences.search_page, classReferences.no_results_for_refine], [classReferences.result_confirmation_page, classReferences.conf_results_container])
-// };
 
 const displayInfoInConfirmationPage = data => {
     const { wUrl, wTeaser, Name, Type } = data.Similar.Info[0]
@@ -173,11 +170,10 @@ const displayInfoInConfirmationPage = data => {
 
 const displayTasteDiveData = data => {
     if (!data.Similar.Results.length) {
-        displayNoResultsInConfimraitonPage();
+        displayNoResultsInConfirmationPage();
         return;
     }
     state.result = data.Similar.Results;
-
     displayInfoInConfirmationPage(data);
 };
 
@@ -191,7 +187,7 @@ const updateResults = (ele, index) => {
     }
     else {
         return (
-                `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
+                `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${index}">
                 <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
        );
     }
@@ -224,15 +220,15 @@ const makeASecondCallToWiki = () => {
 };
 
 const renderResults = listOfResultsElement => {
-    $(window).scrollTop(0)
-
     $(".result-list").html(listOfResultsElement);
     $(".page-number").text(`Page: ${sliceIndex}`);
+
+    $(window).scrollTop(0)
 }
 
 const renderResultsToResultsPage = () => {
     let resultArray = state.wikiPicsForResults.slice(0, 5);
-
+    console.log(state.wikiPicsForResults)
     const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index));
 
     addAndRemoveClasses([classReferences.no_refined_results], [classReferences.results_container]);
@@ -253,8 +249,6 @@ const renderMoreResultsToResultsPage = () => {
 
         sliceIndex++;
         renderResults(listOfResultsElement);
-
-        $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     }
 };
 
@@ -268,15 +262,11 @@ const renderPriorPageOfResults = () => {
     sliceIndex++;
     renderResults(listOfResultsElement);
 
-    if (sliceIndex === 1) {
-        $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
-    }
 };
-
 
 const getInfoForRefinedSearch = data => {
     if (!data.Similar.Results.length) {
-        addAndRemoveClasses([classReferences.results_container], [classReferences.no_refined_results]);
+        addAndRemoveClasses([classReferences.results_container, classReferences.result_buttons], [classReferences.no_refined_results]);
         updateNoResultLanguage($(".no-type-result"), $(".no-term-result"))
 
     }
@@ -297,8 +287,7 @@ const formatedResultInfoHtml = () => {
             )
 };
 
-
-const updateStateForResultInfo = data => {
+const renderInfoToInfoPage = data => {
     state.Result_Info = data;
     const infoHtml = formatedResultInfoHtml();
     $(".info-container").html(infoHtml);
@@ -325,11 +314,13 @@ const watchForSearchClick = () => {
 const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
+
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results])
+        $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
 
         let typeOfInterest= $(event.target).val();
-        resetState(typeOfInterest);
 
+        resetState(typeOfInterest);
         getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
         $(window).scrollTop(0)
     });
@@ -337,16 +328,17 @@ const watchForRefinedSearchClick = () => {
 
 const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
-        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_buttons])
+        $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
 
-        sliceIndex = 0;
+        state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
         let index = $(event.target).closest(".info-container")
                                    .find(".index-p")
                                    .attr("data-indexnum")
+        let typeOfInterest = state.result[index].Type;
 
-        state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
-        state.wikiPicsForResults = [];
-        getDataFromTasteDiveApi(state.searchQuery, state.result[index].Type, getInfoForRefinedSearch)
+        resetState(typeOfInterest);
+        getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
     });
 };
 
@@ -361,14 +353,32 @@ const watchForGoToResultsPageClick = () => {
 
 const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
-        addAndRemoveClasses(["string"], [classReferences.more_results, classReferences.result_thumbs, classReferences.results])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_buttons])
         $(".info-container").html("");
+    });
+};
+
+const watchForGetMoreInfoClick = () => {
+     $(".result-list").on("click", ".result-thumbs", event => {
+          addAndRemoveClasses([classReferences.result_buttons, classReferences.result_thumbs, classReferences.results], [classReferences.info_container, event.target])
+          $(event.target).next(".results").removeClass("hide");
+
+          state.indexNum = (parseInt($(event.target).attr("data-index")));
+          let searchFor = state.wikiPicsForResults[state.indexNum].title;
+
+          getDataFromTasteDiveApi(searchFor, state.type, renderInfoToInfoPage)
     });
 };
 
 const watchForPrevButtonClick = () => {
     $(".prev-button").on("click", event  => {
-      addAndRemoveClasses([classReferences.results_page, classReferences.info_container], [classReferences.result_confirmation_page])
+        if ($(classReferences.info_container).hasClass("hide")) {
+        addAndRemoveClasses([classReferences.results_page], [classReferences.result_confirmation_page])
+      }
+      else {
+        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_buttons])
+        $(".info-container").html("");
+      }
     });
 };
 
@@ -400,30 +410,22 @@ const watchForMoreYoutubeVideosClick = () => {
     });
 };
 
-const watchForMoreInfoClick = () => {
-     $(".result-list").on("click", ".result-thumbs", event => {
-          addAndRemoveClasses([classReferences.more_results, classReferences.result_thumbs, classReferences.results], [classReferences.info_container, event.target])
-          $(event.target).next(".results").removeClass("hide");
-
-          state.indexNum = (parseInt($(event.target).attr("data-index")));
-          let searchFor = state.wikiPicsForResults[state.indexNum].title;
-
-          getDataFromTasteDiveApi(searchFor, state.type, updateStateForResultInfo)
+const watchForNextResultsClick = () => {
+    $(".more-results").on("click", event => {
+        renderMoreResultsToResultsPage();
+        $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
 
-const watchForMoreResultsClick = () => {
-    $(".more-results").on("click", event => {
-        renderMoreResultsToResultsPage();
-        console.log(state.result);
-    });
-}
-
 const watchForPriorResultsClick = () => {
-  $(".go-back-to-prior-page-of-results").on("click", event => {
-        renderPriorPageOfResults();
-  })
-}
+    $(".go-back-to-prior-page-of-results").on("click", event => {
+          renderPriorPageOfResults();
+          if (sliceIndex === 1) {
+              $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
+        }
+    });
+};
+
 const init = () => {
     watchForSearchClick();
     watchForRefinedSearchClick();
@@ -431,6 +433,8 @@ const init = () => {
 
     watchForGoToResultsPageClick();
     watchForGoBackToResultsClick();
+    watchForGetMoreInfoClick();
+
     watchForReturnHomeClick();
     watchForPrevButtonClick();
 
@@ -438,9 +442,8 @@ const init = () => {
     watchForGoBackFromEmbedClick();
     watchForMoreYoutubeVideosClick();
 
-    watchForMoreInfoClick();
-    watchForMoreResultsClick();
-    watchForPriorResultsClick()
+    watchForNextResultsClick();
+    watchForPriorResultsClick();
 }
 
 $(init);
