@@ -39,6 +39,8 @@ const classReferences = {
     results_container: ".results-container",
     no_refined_results: ".no-refined-results",
     result_buttons: ".result-buttons",
+    youtube_channel_links: ".youtube-channel-links",
+    more: ".more",
     result_list: ".result-list"
 };
 
@@ -56,6 +58,7 @@ let state = {
       state.wikiPicsForResults = [];
       state.type = typeOfInterest === all ? null : typeOfInterest.toLowerCase();
       sliceIndex = 1;
+      $(window).scrollTop(0)
   };
 
 const assignNewPageTokens = (data) => {
@@ -112,18 +115,18 @@ const getFormatedHtmlForYouTubeResults = ele => {
     return (
           `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
            <div class="iFrame hide">
-              <iframe width="350" height="250" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
+              <iframe width="300px" height="330px" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
               <button type="button" class="back">Back</button>
            </div>
            <p class="channel">
-              <a href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Channel ${ele.snippet.channelTitle}</a>
+              <a class="youtube-channel-links" href="https://www.youtube.com/channel/${ele.snippet.channelId}">Watch More Videos from the Youtube Channel ${ele.snippet.channelTitle}</a>
            </p>`
     );
 }
 
 const displayYouTubeData = data => {
     assignNewPageTokens(data);
-    $('.youtube-heading').html(`Youtube Videos for the search term "${state.searchQuery}"`)
+    // $('.youtube-heading').html(`Youtube videos for "${state.searchQuery}"`)
 
     if (!data.items) {
         $('.youtube-video-results').append("No Results");
@@ -182,13 +185,13 @@ const updateResults = (ele, index) => {
     if(!ele.thumbnail) {
         return (
                 `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${index}">
-                <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+                <p class="results">${ele.title.toUpperCase()}</p>`
         );
     }
     else {
         return (
                 `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${index}">
-                <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+                <p class="results">${ele.title.toUpperCase()}</p>`
        );
     }
 };
@@ -197,20 +200,19 @@ const updateForMoreResults = (ele, index, sliceIndex) => {
     if(!ele.thumbnail) {
           return (
                   `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
-                  <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+                  <p class="results">${ele.title.toUpperCase()}</p>`
          );
     }
     else {
           return (
                   `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
-                  <p class="results">Result Name: ${ele.title.toUpperCase()}</p>`
+                  <p class="results">${ele.title.toUpperCase()}</p>`
          );
     }
 };
 
-
 const storeWikiPicsForResults = data => {
-    state.wikiPicsForResults.push(data.query.pages.sort((a, b) => a.index - b.index)[0])
+    state.wikiPicsForResults.push(data.query.pages.sort((a, b) => a.index - b.index)[0]);
     renderResultsToResultsPage();
 };
 
@@ -223,12 +225,11 @@ const renderResults = listOfResultsElement => {
     $(".result-list").html(listOfResultsElement);
     $(".page-number").text(`Page: ${sliceIndex}`);
 
-    $(window).scrollTop(0)
+    $("result-list").scrollTop(0)
 }
 
 const renderResultsToResultsPage = () => {
     let resultArray = state.wikiPicsForResults.slice(0, 5);
-    console.log(state.wikiPicsForResults)
     const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index));
 
     addAndRemoveClasses([classReferences.no_refined_results], [classReferences.results_container]);
@@ -278,13 +279,18 @@ const getInfoForRefinedSearch = data => {
 
 const formatedResultInfoHtml = () => {
     return (
-          `<p class ="index-p" data-indexnum="${state.indexNum}">More Info About ${state.wikiPicsForResults[state.indexNum].title}<p><br>
-          <p>${state.Result_Info.Similar.Info[0].wTeaser}
-              <a href="${state.Result_Info.Similar.Info[0].wUrl}">Read More</a>
-              <div class="iFrame"><iframe width="350" height="250" src="http://www.youtube.com/embed/${state.Result_Info.Similar.Info[0].yID}"  frameborder="0" allowfullscreen></iframe><br>
-              <button type="button" class="back-to-result-list">Go back to more like ${state.searchQuery}!</button>
-              <button type="button" class="find-more-like-new-topic">Find MORE like ${state.wikiPicsForResults[state.indexNum].title}!</button>`
-            )
+            `<div class ="index-p result-info-heading" data-indexnum="${state.indexNum}">More Info About ${state.wikiPicsForResults[state.indexNum].title}</div>
+             <div class="info-paragraph">${state.Result_Info.Similar.Info[0].wTeaser}
+                <a class="info-link" href="${state.Result_Info.Similar.Info[0].wUrl}">Read More</a>
+            </div>
+            <div class="iFrame">
+                <iframe width="350" height="250" src="http://www.youtube.com/embed/${state.Result_Info.Similar.Info[0].yID}"  frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="info-buttons-container">
+                <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
+                <button type="button" class="find-more-like-new-topic info-buttons">Find MORE like ${state.wikiPicsForResults[state.indexNum].title}!</button>
+            </div>`
+          )
 };
 
 const renderInfoToInfoPage = data => {
@@ -322,7 +328,7 @@ const watchForRefinedSearchClick = () => {
 
         resetState(typeOfInterest);
         getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
-        $(window).scrollTop(0)
+
     });
 };
 
@@ -384,7 +390,7 @@ const watchForPrevButtonClick = () => {
 
 
 const watchForReturnHomeClick = () => {
-    $(".return-home-button").on("click", event => {
+    $(".js-return-home-button").on("click", event => {
         addAndRemoveClasses([classReferences.results_page, classReferences.result_confirmation_page, classReferences.no_results, classReferences.info_container], [classReferences.search_page])
         $(".search-field").val("");
     });
@@ -392,15 +398,14 @@ const watchForReturnHomeClick = () => {
 
 const watchForEmbedClick = () => {
     $(".youtube-video-results").on("click", ".thumbs", event => {
-        addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs])
+        addAndRemoveClasses([classReferences.iFrame, classReferences.thumbs, classReferences.youtube_channel_links, classReferences.more], [""]);
         $(event.target).next(".iFrame").removeClass("hide");
-        $(event.target).addClass("hide")
     });
 };
 
 const watchForGoBackFromEmbedClick = () => {
     $(".youtube-video-results").on("click", ".back", event => {
-        addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs])
+        addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs, classReferences.youtube_channel_links, classReferences.more])
     });
 };
 
@@ -413,6 +418,7 @@ const watchForMoreYoutubeVideosClick = () => {
 const watchForNextResultsClick = () => {
     $(".more-results").on("click", event => {
         renderMoreResultsToResultsPage();
+
         $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
@@ -420,6 +426,7 @@ const watchForNextResultsClick = () => {
 const watchForPriorResultsClick = () => {
     $(".go-back-to-prior-page-of-results").on("click", event => {
           renderPriorPageOfResults();
+
           if (sliceIndex === 1) {
               $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
         }

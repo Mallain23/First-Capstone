@@ -8,6 +8,7 @@
         <link href="https://fonts.googleapis.com/css?family=Baloo:400,700" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Indie+Flower:400,700" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Rasa:400,700" rel="stylesheet">
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="grid.css">
         <title>More like THAT!</title>
@@ -18,12 +19,7 @@
 
 
         <div class="search-page">
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="style-intro">More Like That!</h1>
-                </div>
-            </div>
-            <div class="button-container">
+            <h1 class="style-intro">More Like That!</h1>
                 <form action="#" class="js-search-form">
                     <label for="query" class="style-label">Tell us what you are interested in, so we can help you find MORE like THAT!</label><br>
                         <input type="text" name="search" placeholder="Enter an interest to find MORE like THAT! " class="search-field style-search"/><br>
@@ -53,8 +49,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="no-results hide create-space">
+              <div class="no-results hide create-space">
                     <h2>Sorry your search term did not return any results!</h2>
                     <p> Try redefining your search term!<p>
               </div>
@@ -62,7 +57,8 @@
 
 
         <div class="result-confirmation-page hide">
-            <div class="category-filters">
+            <div class="container">
+                    <div class="category-filters">
                 <form action="#" class="js-search-form">
                     <div class="row-for-buttons">
                         <div class="button-col">
@@ -98,26 +94,39 @@
                 </form>
             </div>
             <div class="no-results-for-refine style-center">
-                <h2>Sorry, there are no <span class="no-type-result"></span> for the search term <span class="no-term-result"></span>!</h2>
-                <p>Try a different category or click home to redefine your search!</p>
+                <div class="row">
+                    <div class="col-12">
+                        <h2>Sorry, there are no <span class="no-type-result"></span> for the search term <span class="no-term-result"></span>!</h2>
+                        <p>Try a different category or click home to redefine your search!</p>
+                    </div>
+                </div>
             </div>
             <div class="conf-results-container">
                 <div class="column col1">
                     <div class="image-container">
-                        <div>Name: <span class="name-of-interest"></span></div><br>
-                        <div>Type: <span class="type-of-interest"></span></div>
                         <img class="info-image" src="">
+                        <div class="headers">
+                            <span class="topic-headers"><span class="name-of-interest"></span></span><br>
+                            <span class="topic-headers">Category: <span class="type-of-interest"></span></span>
+                        </div>
                     </div>
-                        <div class="info-summary"><a href="" class="wiki-link">Read more!</a></div>
-                          <button type="button" class="go-to-results-button">Yes!! I want MORE like THAT!!!!!</button>
-                          <button type="button" class="js-return-home-button return-home-button">This is NOT what I want more of, let me refine my search! </button>
+                        <div class="info-summary"><a href="" class="wiki-link">READ MORE!</a></div>
+                        <div class="button-container">
+                          <button type="button" class="go-to-results-button conf-buttons">Yes!! I want MORE like THAT!!!!!</button>
+                          <button type="button" class="js-return-home-button conf-home conf-buttons">This is NOT what I want more of, let me refine my search! </button>
+                      </div>
                     </div>
                 <div class="column col2">
-                    <div class="youtube-heading"></div>
+                    <!-- <div class="youbtube-heading-container">
+                        <span class="youtube-heading"></span>
+                    </div> -->
+                    <div class=youtube-results-and-button>
                     <div class="youtube-video-results"></div>
                     <button type="button" class="more smaller">See More Videos!</button>
+                  </div>
                 </div>
         </div>
+      </div>
       </div>
 
 
@@ -168,10 +177,11 @@
                 <div class="column col3">
                     <div class="result-list"></div>
                     <div class="result-buttons">
-                        <button type="button" disabled class="go-back-to-prior-page-of-results">Previous Result Page</button>
-                        <button type="button" class="more-results smaller">Next Result Page</button>
+                        <button type="button" disabled class="go-back-to-prior-page-of-results result-button next-prev">Previous Result Page</button>
+                        <button type="button" class="more-results smaller result-button next-prev">Next Result Page</button>
                         <div class="page-number"></div>
                     </div>
+
               </div>
               <div class="column col4">
                   <div class="info-container"></div>
