@@ -11,7 +11,7 @@ const ApiKeys = {
 
 const all = "All";
 
-let sliceIndex = 1;
+let sliceIndex = 0;
 
 const maxResults = 5;
 
@@ -57,7 +57,7 @@ let state = {
   const resetState = (typeOfInterest) => {
       state.wikiPicsForResults = [];
       state.type = typeOfInterest === all ? null : typeOfInterest.toLowerCase();
-      sliceIndex = 1;
+      sliceIndex = 0;
       $(window).scrollTop(0)
   };
 
@@ -79,7 +79,7 @@ const addAndRemoveClasses = (addArray, removeArray) => {
 
 
 const getDataFromWikipediaApi = (searchFor, callback) => {
-$.ajax({
+ return $.ajax({
     url: `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages%7Cpageterms&generator=prefixsearch&redirects=1&formatversion=2&piprop=thumbnail&pithumbsize=250&pilimit=20&wbptterms=description&gpssearch=${searchFor}&gpslimit=20`,
     method: "GET",
     dataType: "jsonp",
@@ -181,44 +181,37 @@ const displayTasteDiveData = data => {
 };
 
 
-const updateResults = (ele, index) => {
+const storeWikiPicsForResults = args => {
+    state.wikiPicsForResults = args.map(ele => {
+        return ele[0].query.pages.find(ele2 => {
+            return ele2.index === 1
+        })
+    })
+    renderResultsToResultsPage();
+}
+
+const makeASecondCallToWiki = () => {
+    let arrayOfSearchTerms = state.result.map(ele => ele.Name);
+
+    const arrayOfPromises = arrayOfSearchTerms.map(ele => getDataFromWikipediaApi(ele));
+    $.when.apply($, arrayOfPromises).then((...args) => {
+      storeWikiPicsForResults(args);
+    });
+};
+
+const updateResults = (ele, index, sliceIndex) => {
     if(!ele.thumbnail) {
         return (
-                `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${index}">
+                `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
                 <p class="results">${ele.title.toUpperCase()}</p>`
         );
     }
     else {
         return (
-                `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${index}">
+                `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
                 <p class="results">${ele.title.toUpperCase()}</p>`
        );
     }
-};
-
-const updateForMoreResults = (ele, index, sliceIndex) => {
-    if(!ele.thumbnail) {
-          return (
-                  `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
-                  <p class="results">${ele.title.toUpperCase()}</p>`
-         );
-    }
-    else {
-          return (
-                  `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
-                  <p class="results">${ele.title.toUpperCase()}</p>`
-         );
-    }
-};
-
-const storeWikiPicsForResults = data => {
-    state.wikiPicsForResults.push(data.query.pages.sort((a, b) => a.index - b.index)[0]);
-    renderResultsToResultsPage();
-};
-
-const makeASecondCallToWiki = () => {
-    let arrayOfSearchTerms = state.result.map(ele => ele.Name);
-    arrayOfSearchTerms.forEach(ele => getDataFromWikipediaApi(ele, storeWikiPicsForResults));
 };
 
 const renderResults = listOfResultsElement => {
@@ -229,40 +222,26 @@ const renderResults = listOfResultsElement => {
 }
 
 const renderResultsToResultsPage = () => {
-    let resultArray = state.wikiPicsForResults.slice(0, 5);
-    const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index));
+    let resultArray = state.wikiPicsForResults.slice(sliceIndex * 5, (sliceIndex * 5) + 5);
+    if (resultArray.length < 0) {
+        $(".result-list").append("<h3>Sorry, no additional results</h3>");
+        addAndRemoveClasses([classReferences.more_results], [""]);
+        return;
+    }
+    const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index, sliceIndex));
 
     addAndRemoveClasses([classReferences.no_refined_results], [classReferences.results_container]);
+    sliceIndex++;
     renderResults(listOfResultsElement);
-};
-
-const renderMoreResultsToResultsPage = () => {
-    let resultArray = state.wikiPicsForResults.slice((sliceIndex * 5), (sliceIndex * 5) + 5);
-
-    if (!resultArray.length) {
-        $(".result-list").append("<h3>Sorry, no additional results</h3>");
-        addAndRemoveClasses([classReferences.more_results]);
-    }
-    else {
-        const listOfResultsElement = resultArray.map((ele, index) => {
-            return updateForMoreResults(ele, index, sliceIndex)
-        });
-
-        sliceIndex++;
-        renderResults(listOfResultsElement);
-    }
 };
 
 const renderPriorPageOfResults = () => {
-    sliceIndex = sliceIndex - 2;
+
+    sliceIndex = sliceIndex - 1;
     let resultArray = state.wikiPicsForResults.slice((sliceIndex * 5), (sliceIndex * 5) + 5);
-    const listOfResultsElement = resultArray.map((ele, index) => {
-          return updateForMoreResults(ele, index, sliceIndex)
-    });
+    const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index, sliceIndex));
 
-    sliceIndex++;
     renderResults(listOfResultsElement);
-
 };
 
 const getInfoForRefinedSearch = data => {
@@ -277,25 +256,27 @@ const getInfoForRefinedSearch = data => {
      };
 };
 
-const formatedResultInfoHtml = () => {
+const formatedResultInfoHtml = (infoObj) => {
     return (
-            `<div class ="index-p result-info-heading" data-indexnum="${state.indexNum}">More Info About ${state.wikiPicsForResults[state.indexNum].title}</div>
-             <div class="info-paragraph">${state.Result_Info.Similar.Info[0].wTeaser}
-                <a class="info-link" href="${state.Result_Info.Similar.Info[0].wUrl}">Read More</a>
+            `<div class ="index-p result-info-heading" data-indexnum="${state.indexNum}">More Info About ${infoObj.Name}</div>
+             <div class="info-paragraph">${infoObj.wTeaser}
+                <a class="info-link" href="${infoObj.wUrl}">Read More</a>
             </div>
             <div class="iFrame">
-                <iframe width="350" height="250" src="http://www.youtube.com/embed/${state.Result_Info.Similar.Info[0].yID}"  frameborder="0" allowfullscreen></iframe>
+                <iframe width="350" height="250" src="http://www.youtube.com/embed/${infoObj.yID}"  frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="info-buttons-container">
                 <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
-                <button type="button" class="find-more-like-new-topic info-buttons">Find MORE like ${state.wikiPicsForResults[state.indexNum].title}!</button>
+                <button type="button" class="find-more-like-new-topic info-buttons">Find MORE like ${infoObj.Name}!</button>
             </div>`
           )
 };
 
-const renderInfoToInfoPage = data => {
-    state.Result_Info = data;
-    const infoHtml = formatedResultInfoHtml();
+const renderInfoToInfoPage = ()=> {
+    let personName = state.wikiPicsForResults[state.indexNum].title
+    let infoObj = state.result.find(ele => ele.Name.toLowerCase() === personName.toLowerCase());
+    const infoHtml = formatedResultInfoHtml(infoObj);
+
     $(".info-container").html(infoHtml);
 }
 
@@ -361,18 +342,18 @@ const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
         addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_buttons])
         $(".info-container").html("");
+        $(".result-list").scrolltop(0);
     });
 };
+
 
 const watchForGetMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
           addAndRemoveClasses([classReferences.result_buttons, classReferences.result_thumbs, classReferences.results], [classReferences.info_container, event.target])
           $(event.target).next(".results").removeClass("hide");
-
           state.indexNum = (parseInt($(event.target).attr("data-index")));
-          let searchFor = state.wikiPicsForResults[state.indexNum].title;
 
-          getDataFromTasteDiveApi(searchFor, state.type, renderInfoToInfoPage)
+          renderInfoToInfoPage();
     });
 };
 
@@ -417,8 +398,8 @@ const watchForMoreYoutubeVideosClick = () => {
 
 const watchForNextResultsClick = () => {
     $(".more-results").on("click", event => {
-        renderMoreResultsToResultsPage();
-
+        renderResultsToResultsPage();
+        $(".result-list").scrolltop(0)
         $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
@@ -426,6 +407,7 @@ const watchForNextResultsClick = () => {
 const watchForPriorResultsClick = () => {
     $(".go-back-to-prior-page-of-results").on("click", event => {
           renderPriorPageOfResults();
+          $(".result-list").scrolltop(0)
 
           if (sliceIndex === 1) {
               $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
