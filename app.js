@@ -38,10 +38,11 @@ const classReferences = {
     youtube_video_results: ".youtube-video-results",
     results_container: ".results-container",
     no_refined_results: ".no-refined-results",
-    result_buttons: ".result-buttons",
+    result_button: ".result-button",
     youtube_channel_links: ".youtube-channel-links",
     more: ".more",
-    result_list: ".result-list"
+    result_list: ".result-list",
+    page_number: ".page-number"
 };
 
 let state = {
@@ -126,7 +127,6 @@ const getFormatedHtmlForYouTubeResults = ele => {
 
 const displayYouTubeData = data => {
     assignNewPageTokens(data);
-    // $('.youtube-heading').html(`Youtube videos for "${state.searchQuery}"`)
 
     if (!data.items) {
         $('.youtube-video-results').append("No Results");
@@ -139,14 +139,16 @@ const displayYouTubeData = data => {
 
 
 const updateNoResultLanguage = (span1, span2) => {
-  span1.text(state.type.toUpperCase());
-  span2.text(state.searchQuery.toUpperCase());
+    span1.text(state.type.toUpperCase());
+    span2.text(state.searchQuery.toUpperCase());
 };
 
 const storeWikiThumbnails = data => {
-    state.confirmationpage_wiki_info = data.query.pages.sort((a, b) => {
-        return a.index - b.index
-  })
+    if (!data.query) {
+      displayNoResultsInConfirmationPage
+      return
+    }
+    state.confirmationpage_wiki_info = data.query.pages.find(ele => ele.index === 1);
 };
 
 const displayNoResultsInConfirmationPage = () => {
@@ -159,15 +161,17 @@ const displayInfoInConfirmationPage = data => {
     const { wUrl, wTeaser, Name, Type } = data.Similar.Info[0]
     $(".wiki-link").attr("href", wUrl);
 
-    if (state.confirmationpage_wiki_info[0].hasOwnProperty("thumbnail")) {
-          $(".info-image").attr("src", `${state.confirmationpage_wiki_info[0].thumbnail.source}`)
+    if (state.confirmationpage_wiki_info.hasOwnProperty("thumbnail")) {
+          $(".info-image").attr("src", `${state.confirmationpage_wiki_info.thumbnail.source}`)
     }
     else {
       $(".info-image").attr("src", "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRtehRUbA2IoixzvtZaGM2ZWLZbNHYaFjH77t_1aS3cleGTQxEwM-ZmiA")
     }
+
     $(".info-summary").prepend(`${wTeaser} `);
     $(".name-of-interest").text(Name.toUpperCase());
     $(".type-of-interest").text(Type.toUpperCase());
+
     addAndRemoveClasses([classReferences.search_page, classReferences.no_results_for_refine], [classReferences.result_confirmation_page, classReferences.conf_results_container])
 };
 
@@ -182,7 +186,9 @@ const displayTasteDiveData = data => {
 
 
 const storeWikiPicsForResults = args => {
-    state.wikiPicsForResults = args.map(ele => {
+    let newArgs = args.filter(ele => ele[0].query);
+
+    state.wikiPicsForResults = newArgs.map(ele => {
         return ele[0].query.pages.find(ele2 => {
             return ele2.index === 1
         })
@@ -204,25 +210,26 @@ const updateResults = (ele, index, sliceIndex) => {
         return (
                 `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
                 <p class="results">${ele.title.toUpperCase()}</p>`
-        );
+               );
     }
     else {
         return (
                 `<img class="result-thumbs" src="${ele.thumbnail.source}" data-index="${(sliceIndex * 5) + index}">
                 <p class="results">${ele.title.toUpperCase()}</p>`
-       );
+               );
     }
 };
 
 const renderResults = listOfResultsElement => {
     $(".result-list").html(listOfResultsElement);
-    $(".page-number").text(`Page: ${sliceIndex}`);
+    $(".page-number").text(`Page: ${sliceIndex + 1}`);
 
     $("result-list").scrollTop(0)
 }
 
 const renderResultsToResultsPage = () => {
     let resultArray = state.wikiPicsForResults.slice(sliceIndex * 5, (sliceIndex * 5) + 5);
+
     if (resultArray.length < 0) {
         $(".result-list").append("<h3>Sorry, no additional results</h3>");
         addAndRemoveClasses([classReferences.more_results], [""]);
@@ -231,16 +238,15 @@ const renderResultsToResultsPage = () => {
     const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index, sliceIndex));
 
     addAndRemoveClasses([classReferences.no_refined_results], [classReferences.results_container]);
-    sliceIndex++;
     renderResults(listOfResultsElement);
+
 };
 
 const renderPriorPageOfResults = () => {
-
     sliceIndex = sliceIndex - 1;
+
     let resultArray = state.wikiPicsForResults.slice((sliceIndex * 5), (sliceIndex * 5) + 5);
     const listOfResultsElement = resultArray.map((ele, index) => updateResults(ele, index, sliceIndex));
-
     renderResults(listOfResultsElement);
 };
 
@@ -272,13 +278,23 @@ const formatedResultInfoHtml = (infoObj) => {
           )
 };
 
-const renderInfoToInfoPage = ()=> {
+const displayFormattedNoAdditionalInfoHtml = () => {
+    return (
+            `<div class="info-buttons-container">Sorry, no additional info available!
+            <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
+            <button type="button" class="find-more-like-new-topic info-buttons">Find MORE like ${infoObj.Name}!</button>
+            </div>`
+          )
+}
+
+const renderInfoToInfoPage = () => {
     let personName = state.wikiPicsForResults[state.indexNum].title
-    let infoObj = state.result.find(ele => ele.Name.toLowerCase() === personName.toLowerCase());
+    let infoObj = state.result.find(ele => ele.Name.toLowerCase().trim() === personName.toLowerCase().trim());
+
     const infoHtml = formatedResultInfoHtml(infoObj);
 
     $(".info-container").html(infoHtml);
-}
+};
 
 const watchForSearchClick = () => {
     $('.js-search-form').on("click", ".search-button", event => {
@@ -302,7 +318,7 @@ const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
 
-        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
 
         let typeOfInterest= $(event.target).val();
@@ -315,8 +331,9 @@ const watchForRefinedSearchClick = () => {
 
 const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
-        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_buttons])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
+
 
         state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
         let index = $(event.target).closest(".info-container")
@@ -331,16 +348,17 @@ const watchForANewSearchClick = ()=> {
 
 const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
-        addAndRemoveClasses([classReferences.results_page,  classReferences.search_container, classReferences.result_confirmation_page], [classReferences.results_page]);
+        addAndRemoveClasses([classReferences.search_container, classReferences.result_confirmation_page], [classReferences.results_page, classReferences.js_new_search_form, classReferences.results_container]);
+        $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
         makeASecondCallToWiki()
 
-        $(window).scrollTop(0)
+        $("window").scrollTop(0)
     });
 };
 
 const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
-        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_buttons])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_button, classReferences.page_number])
         $(".info-container").html("");
         $(".result-list").scrolltop(0);
     });
@@ -349,7 +367,7 @@ const watchForGoBackToResultsClick = () => {
 
 const watchForGetMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
-          addAndRemoveClasses([classReferences.result_buttons, classReferences.result_thumbs, classReferences.results], [classReferences.info_container, event.target])
+          addAndRemoveClasses([classReferences.result_button, classReferences.result_thumbs, classReferences.results, classReferences.page_number], [classReferences.info_container, event.target])
           $(event.target).next(".results").removeClass("hide");
           state.indexNum = (parseInt($(event.target).attr("data-index")));
 
@@ -360,12 +378,12 @@ const watchForGetMoreInfoClick = () => {
 const watchForPrevButtonClick = () => {
     $(".prev-button").on("click", event  => {
         if ($(classReferences.info_container).hasClass("hide")) {
-        addAndRemoveClasses([classReferences.results_page], [classReferences.result_confirmation_page])
-      }
-      else {
+            addAndRemoveClasses([classReferences.results_page], [classReferences.result_confirmation_page])
+            sliceIndex = 0
+            return
+        }
         addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_buttons])
         $(".info-container").html("");
-      }
     });
 };
 
@@ -398,8 +416,8 @@ const watchForMoreYoutubeVideosClick = () => {
 
 const watchForNextResultsClick = () => {
     $(".more-results").on("click", event => {
+        sliceIndex++;
         renderResultsToResultsPage();
-        $(".result-list").scrolltop(0)
         $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
@@ -407,9 +425,9 @@ const watchForNextResultsClick = () => {
 const watchForPriorResultsClick = () => {
     $(".go-back-to-prior-page-of-results").on("click", event => {
           renderPriorPageOfResults();
-          $(".result-list").scrolltop(0)
 
-          if (sliceIndex === 1) {
+
+          if (sliceIndex === 0) {
               $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
         }
     });

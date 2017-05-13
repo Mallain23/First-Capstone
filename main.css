@@ -1,6 +1,8 @@
 
-.create-space {
-  margin-top: 230px;
+
+
+.hide {
+  display: none;
 }
 
 .style-intro {
@@ -8,7 +10,7 @@
   font-size: 70px;
 }
 
-.style-label {
+.style-sub-intro {
   font-family: indie flower;
   font-size: 30px;
 }
@@ -21,7 +23,7 @@
 }
 .style-search {
   font-size: 20px;
-  width: 500px;
+  width: 100%;
   height: 40px;
   margin-bottom: 30px;
   margin-top: 15px;
@@ -37,7 +39,7 @@
   border: 2px solid black;
   background-color: #C0C0C0;
   padding: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   margin-top: 5px;
   font-family: Baloo;
   font-size: 20px
@@ -58,7 +60,9 @@
   background-color: #C0C0C0;
   padding: 18px;
   font-family: Baloo;
-  height: 250px;
+  height: 260px;
+  width: 100%;
+  margin-bottom: 5px;
   overflow: scroll;
 }
 
@@ -131,17 +135,17 @@
   font-size: 20px;
 }
 
-.youtube-channel-links:hover {
-  font-size: 25px;
-  color: #196619;
-  transition-duration: .5s;
-}
+
 .conf-buttons {
   background-color: #C0C0C0;
   font-family: baloo;
-  border: 1px solid black;
-  font-size: 15px;
-  padding: 3px;
+  border: 2px solid black;
+  font-size: 17px;
+  padding: 8px;
+  width: 100%;
+  margin-bottom: 25px;
+
+
 }
 
 .back, .more {
@@ -171,7 +175,7 @@
 }
 .conf-buttons:hover {
   padding: 10px;
-  font-size: 15px;
+  font-size: 18px;
   transition-duration: .5s;
 }
 .prev-button:hover {
@@ -227,43 +231,10 @@
 }
 
 
-.hide {
-  display: none;
-}
-
-.column {
-  display: inline-block;
-}
-
-.col1 {
-  width: 50%;
-  /*position: fixed;*/
-  margin-left: 30px;
-  margin-top: 30px;
-}
-.col2 {
-  width: 30%;
-  float: right;
-  margin-top: 40px;
-}
-
-.col3 {
-  width: 35%;
-  float: left;
-  padding-top: 30px;
-}
 
 
-.col4 {
-  width: 55%;
-
-}
 
 .info-image {
-  width: 350px;
-  height: 400px;
-  margin-bottom: 10px;
-  margin-top: 10px;
   border: 3px solid black;
 }
 
@@ -279,87 +250,22 @@
   border: 2px solid black;
 }
 
-/*.thumbs {
-  height: 330px;
-  width: 250px;
-  border: 2px solid black;
-}
-
-.thumbs:hover {
-  height: 350px;
-  width: 300px;
-  transition-duration: .5s;
-}*/
-.result-thumbs:hover {
-  height: 275px;
-  width: 230px;
-  transition-duration: .5s;
-}
-
-.result-list {
-  text-align: left;
-  margin-left: 20px;
-}
-.youtube-results-and-button {
-  overflow: scroll;
-  height: 600px;
-  margin-bottom: 20px;
-  margin-right: 20px;
-  padding: 20px;
-  border: 1px solid black;
-  background-color: #C0C0C0;
-}
-
-.youtube-results-and-button:hover {
-  background-color: #ADD8E6;
-  transition-duration: .5s;
-}
-
-.result-list {
-  padding: 15px;
-  height: 510px;
-  width: 320px;
-  overflow: scroll;
-  padding-left: 35px;
-  padding-top: 30px;
-  margin-bottom: 20px;
-  border: 2px solid black;
-  background-color: #C0C0C0;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.result-list:hover {
-  height: 600px;
-  width: 350px;
-  background-color: #ADD8E6;
-  transition-duration: .5s;
-}
-
 .next-prev, .page-number {
   background-color: #C0C0C0;
   font-family: Baloo;
-  font-size: 20px;
+  font-size: 17px;
   border: 2px solid black;
+  padding: 5px;
+  width: 100%;
 }
 
-.next-prev:hover {
-  background-color: #ecc6d9;
-  font-size: 25px;
-  transition-duration: .5s;
-}
-
-.page-number:hover {
-  background-color: #ADD8E6;
-  font-size: 25px;
-  transition-duration: .5s;
-}
 .page-number {
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
   margin-bottom: 30px;
-  width: 50%;
+  width: 100%;
+  font-size: 20px;
 }
 
 .results {
@@ -373,15 +279,11 @@
   font-size: 30px;
   background-color: #C0C0C0;
   margin-top: 30px;
-  margin-bottom: 20px:
+  margin-bottom: 10px:
 
 }
 
-.result-info-heading:hover {
-  background-color: #ADD8E6;
-  /*font-size: 40px;
-  transition-duration: .5s;*/
-}
+
 
 .info-paragraph {
   border: 2px solid black;
@@ -391,7 +293,7 @@
   margin-bottom: 20px;
   height: 250px;
   overflow: scroll;
-  margin-top: 30px;
+  margin-top: 20px;
   padding-top: 25px;
   padding-bottom: 25px;
   padding-left: 30px;
@@ -399,30 +301,118 @@
 
 }
 
-.info-paragraph:hover {
-  background-color: #ADD8E6;
-  /*font-size: 17px;*/
-  transition-duration: .5s;
-  /*height: 300px;*/
-}
-
-.iFrame {
-  margin: 15px;
-}
 
 .info-buttons {
   border: 2px solid black;
   font-family: Baloo;
   font-size: 20px;
   background-color: #C0C0C0;
+  width: 100%;
+
 }
 
-.info-buttons:hover {
-  background-color: #ffff99;
-  font-size: 25px;
-  transition-duration: .5s;
-}
+
 
 .info-buttons-container {
   margin-bottom: 20px;
+  margin-top: 18px;
+}
+
+.youtube-results-and-button {
+  overflow: scroll;
+  height: 350px;
+  margin-bottom: 20px;
+  float: right;
+  border: 2px solid black;
+  background-color: #C0C0C0;
+  padding: 10px;
+}
+  .result-list {
+    padding: 15px;
+    height: 500px;
+    overflow: scroll;
+    padding-left: 35px;
+    padding-top: 30px;
+    margin-bottom: 20px;
+    border: 2px solid black;
+    background-color: #C0C0C0;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    margin-top: 30px;
+  }
+
+
+
+@media only screen and (min-width: 640px) {
+
+.info-container {
+  width: 85%;
+  margin-left: 30px;
+  text-align: center;
+}
+
+  .youtube-results-and-button{
+    height: 765px;
+    padding: 20px;
+  }
+.info-buttons {
+  width: auto;
+}
+  .info-buttons:hover {
+    background-color: #ffff99;
+    transition-duration: .5s;
+  }
+
+  .info-paragraph:hover {
+    background-color: #ADD8E6;
+    /*font-size: 17px;*/
+    transition-duration: .5s;
+    /*height: 300px;*/
+  }
+
+  .result-info-heading:hover {
+    background-color: #ADD8E6;
+
+    transition-duration: .5s;*/
+  }
+
+
+  .next-prev:hover {
+    background-color: #ecc6d9;
+    transition-duration: .5s;
+  }
+
+  .page-number:hover {
+    background-color: #ADD8E6;
+    transition-duration: .5s;
+  }
+
+  .youtube-results-and-button:hover {
+    background-color: #ADD8E6;
+    transition-duration: .5s;
+  }
+
+.result-list {
+  width: 100%;
+  height: 535px;
+}
+
+  .result-list:hover {
+
+    background-color: #ADD8E6;
+    transition-duration: .5s;
+  }
+
+  .result-thumbs:hover {
+    height: 275px;
+    width: 230px;
+    transition-duration: .5s;
+  }
+
+  .youtube-channel-links:hover {
+    font-size: 25px;
+    color: #196619;
+    transition-duration: .5s;
+  }
 }
