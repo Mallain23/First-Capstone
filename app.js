@@ -156,21 +156,25 @@ const displayNoResultsInConfirmationPage = () => {
       updateNoResultLanguage($(".no-type-result"), $(".no-term-result"));
 };
 
-
-const displayInfoInConfirmationPage = data => {
+const displayInfoCode = data => {
     const { wUrl, wTeaser, Name, Type } = data.Similar.Info[0]
     $(".wiki-link").attr("href", wUrl);
 
     if (state.confirmationpage_wiki_info.hasOwnProperty("thumbnail")) {
-          $(".info-image").attr("src", `${state.confirmationpage_wiki_info.thumbnail.source}`)
+        $(".info-image").attr("src", `${state.confirmationpage_wiki_info.thumbnail.source}`)
     }
     else {
       $(".info-image").attr("src", "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRtehRUbA2IoixzvtZaGM2ZWLZbNHYaFjH77t_1aS3cleGTQxEwM-ZmiA")
-    }
+  }
 
-    $(".info-summary").prepend(`${wTeaser} `);
-    $(".name-of-interest").text(Name.toUpperCase());
-    $(".type-of-interest").text(Type.toUpperCase());
+  $(".info-summary").prepend(`${wTeaser} `);
+  $(".name-of-interest").text(Name.toUpperCase());
+  $(".type-of-interest").text(Type.toUpperCase());
+
+};
+
+const displayInfoInConfirmationPage = data => {
+    displayInfoCode(data);
 
     addAndRemoveClasses([classReferences.search_page, classReferences.no_results_for_refine], [classReferences.result_confirmation_page, classReferences.conf_results_container])
 };
@@ -250,16 +254,16 @@ const renderPriorPageOfResults = () => {
     renderResults(listOfResultsElement);
 };
 
-const getInfoForRefinedSearch = data => {
+const getInfoForRefinedSearch = (data) => {
     if (!data.Similar.Results.length) {
         addAndRemoveClasses([classReferences.results_container, classReferences.result_buttons], [classReferences.no_refined_results]);
         updateNoResultLanguage($(".no-type-result"), $(".no-term-result"))
-
+        return
     }
-    else {
-        state.result = data.Similar.Results;
-        makeASecondCallToWiki();
-     };
+    state.result = data.Similar.Results;
+    displayInfoCode(data);
+    makeASecondCallToWiki();
+
 };
 
 const formatedResultInfoHtml = (infoObj) => {
@@ -309,6 +313,8 @@ const renderInfoToInfoPage = () => {
 const watchForSearchClick = () => {
     $('.js-search-form').on("click", ".search-button", event => {
         event.preventDefault();
+        $(".info-summary").text("");
+        $('.youtube-video-results').html("");
 
         let typeOfInterest = $(event.target).val();
         resetState(typeOfInterest)
@@ -318,8 +324,6 @@ const watchForSearchClick = () => {
         getDataFromTasteDiveApi(state.searchQuery, state.type, displayTasteDiveData);
         getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
         getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
-
-        $('.youtube-video-results').html("");
       });
 };
 
@@ -327,6 +331,8 @@ const watchForSearchClick = () => {
 const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
+        $(".info-summary").text("");
+        $('.youtube-video-results').html("")
 
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
@@ -334,8 +340,9 @@ const watchForRefinedSearchClick = () => {
         let typeOfInterest= $(event.target).val();
 
         resetState(typeOfInterest);
-        getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
-
+        getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
+        getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
+        getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch);
     });
 };
 
@@ -343,6 +350,9 @@ const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
+
+        $(".info-summary").text("");
+        $('.youtube-video-results').html("")
 
 
         state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
@@ -352,6 +362,8 @@ const watchForANewSearchClick = ()=> {
         let typeOfInterest = state.result[index].Type;
 
         resetState(typeOfInterest);
+        getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
+        getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
         getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
     });
 };
