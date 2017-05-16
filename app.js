@@ -280,17 +280,27 @@ const formatedResultInfoHtml = (infoObj) => {
 
 const displayFormattedNoAdditionalInfoHtml = () => {
     return (
-            `<div class="info-buttons-container">Sorry, no additional info available!
+            `<h1>Sorry, no additional info available!</h1><div class="info-buttons-container">
             <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
-            <button type="button" class="find-more-like-new-topic info-buttons">Find MORE like ${infoObj.Name}!</button>
             </div>`
           )
 }
 
-const renderInfoToInfoPage = () => {
-    let personName = state.wikiPicsForResults[state.indexNum].title
-    let infoObj = state.result.find(ele => ele.Name.toLowerCase().trim() === personName.toLowerCase().trim());
+const storeNewInfoObj = data => {
+  let newInfoObj = data.similar;
 
+  let infoHtml = !newInfoObj ? displayFormattedNoAdditionalInfoHtml() : formatedResultInfoHtml(newInfoObj)
+
+  $(".info-container").html(infoHtml);
+};
+
+const renderInfoToInfoPage = () => {
+    state.title = state.wikiPicsForResults[state.indexNum].title;
+    let infoObj = state.result.find(ele => ele.Name.toLowerCase().trim() === state.title.toLowerCase().trim());
+    if (!infoObj) {
+      getDataFromTasteDiveApi(URL.TASTEDIVE, state.title, storeNewInfoObj)
+      return
+    }
     const infoHtml = formatedResultInfoHtml(infoObj);
 
     $(".info-container").html(infoHtml);
