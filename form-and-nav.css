@@ -80,12 +80,13 @@
   /* 4 columns, 4/12 in % */
   .form-col-4 {
     width: 33.33%;
-    padding: 0px;
+
   }
 
   /* 6 columns 6/12 in % */
   .form-col-6 {
     width: 50%;
+    padding: 0px;
   }
 
   /* 12 columns, 12/12 */

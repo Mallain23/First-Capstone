@@ -42,6 +42,7 @@ const classReferences = {
     youtube_channel_links: ".youtube-channel-links",
     more: ".more",
     result_list: ".result-list",
+    prev_button: ".prev-button",
     page_number: ".page-number"
 };
 
@@ -116,7 +117,7 @@ const getFormatedHtmlForYouTubeResults = ele => {
     return (
           `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
            <div class="iFrame hide">
-              <iframe width="300px" height="330px" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
+              <iframe width="250px" height="300px" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
               <button type="button" class="back">Back</button>
            </div>
            <p class="channel">
@@ -334,7 +335,7 @@ const watchForRefinedSearchClick = () => {
         $(".info-summary").text("");
         $('.youtube-video-results').html("")
 
-        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
 
         let typeOfInterest= $(event.target).val();
@@ -348,7 +349,7 @@ const watchForRefinedSearchClick = () => {
 
 const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
-        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
 
         $(".info-summary").text("");
@@ -380,7 +381,7 @@ const watchForGoToResultsPageClick = () => {
 
 const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
-        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_button, classReferences.page_number])
+        addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".info-container").html("");
         $(".result-list").scrolltop(0);
     });
@@ -389,7 +390,7 @@ const watchForGoBackToResultsClick = () => {
 
 const watchForGetMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
-          addAndRemoveClasses([classReferences.result_button, classReferences.result_thumbs, classReferences.results, classReferences.page_number], [classReferences.info_container, event.target])
+          addAndRemoveClasses([classReferences.result_button, classReferences.result_thumbs, classReferences.results, classReferences.page_number, classReferences.prev_button], [classReferences.info_container, event.target])
           $(event.target).next(".results").removeClass("hide");
           state.indexNum = (parseInt($(event.target).attr("data-index")));
 
