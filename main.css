@@ -154,7 +154,10 @@ body {
   padding: 5px;
   margin-bottom: 10px;
   cursor: pointer;
+  margin-top: 10px;
 }
+
+
 
 .back:hover, .more:hover {
   background-color: #C0C0C0;
@@ -349,6 +352,10 @@ body {
 
 .info-image, .headers, .info-summary, .button-container {
   margin-left: 0px;
+}
+
+.no-info {
+  color: white;
 }
 
 @media only screen and (min-width: 800px) {

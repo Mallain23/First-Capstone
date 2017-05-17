@@ -285,7 +285,7 @@ const formatedResultInfoHtml = (infoObj) => {
 
 const displayFormattedNoAdditionalInfoHtml = () => {
     return (
-            `<h1>Sorry, no additional info available!</h1><div class="info-buttons-container">
+            `<h1 class="no-info">Sorry, no additional info available!</h1><div class="info-buttons-container">
             <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
             </div>`
           )
@@ -354,6 +354,7 @@ const watchForANewSearchClick = ()=> {
 
         $(".info-summary").text("");
         $('.youtube-video-results').html("")
+        $("body").scrollTop(0);
 
 
         state.searchQuery = state.wikiPicsForResults[state.indexNum].title;
@@ -375,7 +376,7 @@ const watchForGoToResultsPageClick = () => {
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
         makeASecondCallToWiki()
 
-        $("window").scrollTop(0)
+        $("body").scrollTop(0)
     });
 };
 
@@ -383,7 +384,8 @@ const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
         addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".info-container").html("");
-        $(".result-list").scrolltop(0);
+        $(".result-list").scrollTop(0);
+        $("body").scrolTop(0);
     });
 };
 
@@ -441,6 +443,9 @@ const watchForNextResultsClick = () => {
     $(".more-results").on("click", event => {
         sliceIndex++;
         renderResultsToResultsPage();
+
+        $(".result-list").scrollTop(0);
+        $("body").scrollTop(0);
         $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
@@ -449,6 +454,7 @@ const watchForPriorResultsClick = () => {
     $(".go-back-to-prior-page-of-results").on("click", event => {
           renderPriorPageOfResults();
 
+          $(".result-list").scrollTop(0);
 
           if (sliceIndex === 0) {
               $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
