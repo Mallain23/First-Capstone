@@ -2,10 +2,10 @@
 
 body {
   background-image: url("http://www.wallpapers4u.org/wp-content/uploads/dark_background_line_surface_65896_1920x1080.jpg");
-  background-repeat: no-repeat;
+  /*background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-attachment: fixed;*/
 }
 .hide {
   display: none;
