@@ -61,7 +61,12 @@ let state = {
       state.type = typeOfInterest === all ? null : typeOfInterest.toLowerCase();
       sliceIndex = 0;
       $(window).scrollTop(0)
-  };
+};
+
+const resetConfirmationPageResults = () => {
+    $(".info-summary").text("");
+    $('.youtube-video-results').html("");
+};
 
 const assignNewPageTokens = (data) => {
       state = Object.assign({}, state, {
@@ -274,7 +279,7 @@ const formatedResultInfoHtml = (infoObj) => {
                 <a class="info-link" href="${infoObj.wUrl}">Read More</a>
             </div>
             <div class="iFrame">
-                <iframe width="350" height="250" src="http://www.youtube.com/embed/${infoObj.yID}"  frameborder="0" allowfullscreen></iframe>
+                <iframe class="iFrame-box" width="350" height="250" src="http://www.youtube.com/embed/${infoObj.yID}"  frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="info-buttons-container">
                 <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
@@ -302,6 +307,7 @@ const storeNewInfoObj = data => {
 const renderInfoToInfoPage = () => {
     state.title = state.wikiPicsForResults[state.indexNum].title;
     let infoObj = state.result.find(ele => ele.Name.toLowerCase().trim() === state.title.toLowerCase().trim());
+
     if (!infoObj) {
       getDataFromTasteDiveApi(URL.TASTEDIVE, state.title, storeNewInfoObj)
       return
@@ -314,11 +320,12 @@ const renderInfoToInfoPage = () => {
 const watchForSearchClick = () => {
     $('.js-search-form').on("click", ".search-button", event => {
         event.preventDefault();
-        $(".info-summary").text("");
-        $('.youtube-video-results').html("");
 
         let typeOfInterest = $(event.target).val();
+
         resetState(typeOfInterest)
+        resetConfirmationPageResults()
+
 
         state.searchQuery = $(".search-field").val();
 
@@ -332,8 +339,6 @@ const watchForSearchClick = () => {
 const watchForRefinedSearchClick = () => {
     $('.js-new-search-form').on("click", ".search-button", event => {
         event.preventDefault();
-        $(".info-summary").text("");
-        $('.youtube-video-results').html("")
 
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
@@ -341,6 +346,8 @@ const watchForRefinedSearchClick = () => {
         let typeOfInterest= $(event.target).val();
 
         resetState(typeOfInterest);
+        resetConfirmationPageResults();
+
         getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
         getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
         getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch);
@@ -351,9 +358,6 @@ const watchForANewSearchClick = ()=> {
     $(".info-container").on("click", ".find-more-like-new-topic", event => {
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
-
-        $(".info-summary").text("");
-        $('.youtube-video-results').html("")
         $("body").scrollTop(0);
 
 
@@ -361,9 +365,11 @@ const watchForANewSearchClick = ()=> {
         let index = $(event.target).closest(".info-container")
                                    .find(".index-p")
                                    .attr("data-indexnum")
-        let typeOfInterest = state.result[index].Type;
 
+        let typeOfInterest = state.result[index].Type;
         resetState(typeOfInterest);
+        resetConfirmationPageResults()
+
         getDataFromYoutubeApi(state.searchQuery, displayYouTubeData)
         getDataFromWikipediaApi(state.searchQuery, storeWikiThumbnails)
         getDataFromTasteDiveApi(state.searchQuery, state.type, getInfoForRefinedSearch)
@@ -374,9 +380,9 @@ const watchForGoToResultsPageClick = () => {
     $(".go-to-results-button").on("click", event => {
         addAndRemoveClasses([classReferences.search_container, classReferences.result_confirmation_page], [classReferences.results_page, classReferences.js_new_search_form, classReferences.results_container]);
         $(".go-back-to-prior-page-of-results").attr("disabled", "disabled");
-        makeASecondCallToWiki()
-
         $("body").scrollTop(0)
+
+        makeASecondCallToWiki()
     });
 };
 
@@ -384,6 +390,7 @@ const watchForGoBackToResultsClick = () => {
     $(".info-container").on("click", ".back-to-result-list", event => {
         addAndRemoveClasses([classReferences.info_container], [classReferences.result_thumbs, classReferences.results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
         $(".info-container").html("");
+
         $(".result-list").scrollTop(0);
         $("body").scrolTop(0);
     });
@@ -394,8 +401,8 @@ const watchForGetMoreInfoClick = () => {
      $(".result-list").on("click", ".result-thumbs", event => {
           addAndRemoveClasses([classReferences.result_button, classReferences.result_thumbs, classReferences.results, classReferences.page_number, classReferences.prev_button], [classReferences.info_container, event.target])
           $(event.target).next(".results").removeClass("hide");
-          state.indexNum = (parseInt($(event.target).attr("data-index")));
 
+          state.indexNum = (parseInt($(event.target).attr("data-index")));
           renderInfoToInfoPage();
     });
 };
@@ -445,7 +452,6 @@ const watchForNextResultsClick = () => {
         renderResultsToResultsPage();
 
         $(".result-list").scrollTop(0);
-        $("body").scrollTop(0);
         $(".go-back-to-prior-page-of-results").removeAttr("disabled")
     });
 };
