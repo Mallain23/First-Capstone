@@ -8,7 +8,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Baloo:400,700" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Alfa+Slab+One:400,700" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Rasa:400,700" rel="stylesheet">
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="grid2.css">
@@ -35,32 +35,18 @@
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-col-2">
+                    <div class="form-col-12">
                         <button type="submit" value="Movies" class="search-button movie"/>Movies</button>
-                    </div>
-                    <div class="form-col-2">
                         <button type="submit" value="Shows" class="search-button show"/>Shows</button>
-                    </div>
-                    <div class="form-col-2">
                         <button type="submit" value="Books" class="search-button book"/>Books</button>
-                    </div>
-                    <div class="form-col-2">
-                          <button type="submit" value="Authors" class="search-button author"/>Authors</button>
-                    </div>
-                    <div class="form-col-2">
+                        <button type="submit" value="Authors" class="search-button author"/>Authors</button>
                         <button type="submit" value="Music" class="search-button music"/>Music</button>
-                    </div>
-                    <div class="form-col-2">
                         <button type="submit" value="Games" class="search-button game"/>Games</button>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-col-12 space">
-                        <button type="submit" value="All" class="search-button wide-button all"/>All Categories</button>
+                        <button type="submit" value="All" class="search-button all"/>All Categories</button>
                     </div>
                 </div>
             </form>
-             <div class="row">
+            <div class="row">
                 <div class="col-12">
                     <div class="no-results hide">
                         <h2>Sorry your search term did not return any results!</h2>
@@ -74,37 +60,20 @@
         <div class="result-confirmation-page hide">
             <div class="category filters">
                 <form action="#" class="js-search-form">
-                    <div class="form-row">
-                        <div class="form-col-2">
-                            <button type="submit" value="Movies" class="search-button smaller movie"/>Movies</button>
-                        </div>
-                        <div class="form-col-2">
-                            <button type="submit" value="Shows" class="search-button smaller show"/>Shows</button>
-                        </div>
-                        <div class="form-col-2">
-                            <button type="submit" value="Books" class="search-button smaller book"/>Books</button>
-                        </div>
-                        <div class="form-col-2">
-                            <button type="submit" value="Authors" class="search-button smaller author"/>Authors</button>
-                        </div>
-                        <div class="form-col-2">
-                            <button type="submit" value="Music" class="search-button smaller music"/>Music</button>
-                        </div>
-                        <div class="form-col-2">
-                            <button type="submit" value="Games" class="search-button smaller game"/>Games</button>
+                    <div class="form-row smaller-form-row">
+                        <div class="form-col-12">
+                            <button type="submit" value="Movies" class="search-button-smaller search-button movie"/>Movies</button>
+                            <button type="submit" value="Shows" class="search-button-smaller search-button show"/>Shows</button>
+                            <button type="submit" value="Books" class="search-button-smaller search-button book"/>Books</button>
+                            <button type="submit" value="Authors" class="search-button-smaller search-button author"/>Authors</button>
+                            <button type="submit" value="Music" class="search-button-smaller search-button music"/>Music</button>
+                            <button type="submit" value="Games" class="search-button-smaller search-button game"/>Games</button>
+                            <button type="submit" value="All" class="search-button-smaller search-button all"/>All Categories</button>
+                            <button type="button" class="js-return-home-button return-home-button-smaller">Home</button>
                         </div>
                     </div>
-                <div class="form-row space">
-                    <div class="form-col-6">
-                        <button type="submit" value="All" class="search-button smaller medium-button all"/>All Categories</button>
-                    </div>
-                    <div class="form-col-6">
-                        <button type="button" class="js-return-home-button return-home-button smaller">Home</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
+                </form>
+            </div>
             <div class="no-results-for-refine style-center">
                 <div class="row">
                     <div class="col-12 no-results-language">
@@ -113,105 +82,86 @@
                     </div>
                 </div>
             </div>
-
             <div class="conf-results-container">
                 <div class="row">
-                    <div class="col-8">
+                    <div class="col-8 center-8">
                         <img class="info-image" src="">
                         <div class="headers">
                             <span class="topic-headers"><span class="name-of-interest"></span></span><br>
                             <span class="topic-headers">Category: <span class="type-of-interest"></span></span>
                         </div>
-                        <div class="info-summary">
-                            <a href="" class="wiki-link">READ MORE!</a>
-                        </div>
-                        <div class="button-container">
-                            <div class="col-37">
-                                <button type="button" class="go-to-results-button conf-buttons">Yes!! I want MORE like THAT!!!!!</button>
-                            </div>
-                            <div class="col-37">
-                                <button type="button" class="js-return-home-button conf-home conf-buttons">Let me refine my search! </button>
-                            </div>
-                            <div class="col-3"></div>
-                        </div>
+                    <div class="info-summary">
+                        <a href="" class="wiki-link">READ MORE!</a>
                     </div>
-                    <div class="col-4">
-                        <div class="youtube-results-and-button">
-                            <div class="youtube-video-results"></div>
+                    <div class="button-container">
+                        <div class="col-37">
+                            <button type="button" class="go-to-results-button conf-buttons">Yes!! I want MORE like THAT!!!!!</button>
+                        </div>
+                        <div class="col-37">
+                            <button type="button" class="js-return-home-button conf-home conf-buttons">Let me refine my search! </button>
+                        </div>
+                        <div class="col-3"></div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="youtube-results-and-button">
+                        <div class="youtube-video-results"></div>
                             <button type="button" class="more smaller">See More Videos!</button>
                         </div>
                     </div>
                 </div>
             </div>
-    </div>
+        </div>
 
 
 
 
-      <div class="results-page hide">
-          <div class="category-filters">
-              <form action="#" class="js-new-search-form hide">
-                  <div class="form-row">
-                      <div class="form-col-2">
-                          <button type="submit" value="Movies" class="search-button smaller movie"/>Movies</button>
-                      </div>
-                      <div class="form-col-2">
-                          <button type="submit" value="Shows" class="search-button smaller show"/>Shows</button>
-                      </div>
-                      <div class="form-col-2">
-                          <button type="submit" value="Books" class="search-button smaller book"/>Books</button>
-                      </div>
-                      <div class="form-col-2">
-                          <button type="submit" value="Authors" class="search-button smaller author"/>Authors</button>
-                      </div>
-                      <div class="form-col-2">
-                          <button type="submit" value="Music" class="search-button smaller music"/>Music</button>
-                      </div>
-                      <div class="form-col-2">
-                          <button type="submit" value="Games" class="search-button smaller game"/>Games</button>
-                      </div>
-                  </div>
-                  <div class="form-row">
-                      <div class="form-col-6">
-                          <button type="submit" value="All" class="search-button smaller medium-button all"/>All Categories</button>
-                      </div>
-                      <div class="form-col-6">
-                          <button type="button" class="js-return-home-button return-home-button smaller">Home</button>
-                      </div>
-                  </div>
-              </form>
-          </div>
-          <div class="no-refined-results hide">
-              <div class="row">
-                  <div class="col-12 no-results-language">
-                      <h2>Sorry, there are no <span class="no-type-result"></span> for the search term <span class="no-term-result"></span>!</h2>
-                      <p>Try a different category or click home to redefine your search!</p>
-                  </div>
-              </div>
-          </div>
-          <div class="results-container">
-              <div class="row">
-                  <div class="col-4 conf-left-col">
-                      <button type="button" class="prev-button">Go Back To Confirmation Page</button>
-                      <div class="result-list"></div>
-                      <div class="col-6">
-                          <button type="button" disabled class="go-back-to-prior-page-of-results result-button next-prev">Previous Result Page</button>
-                      </div>
-                      <div class="col-6">
-                          <button type="button" class="more-results smaller result-button next-prev">Next Result Page</button>
-                      </div>
-                      <div class="col-12">
-                          <div class="page-number"></div>
-                      </div>
-                  </div>
-                  <div class="col-8">
-                      <div class="info-container hide"></div>
-                  </div>
-              </div>
-          </div>
-      </div>
+        <div class="results-page hide">
+            <div class="category-filters">
+                <form action="#" class="js-new-search-form">
+                    <div class="form-row smaller-form-row">
+                        <div class="form-col-12">
+                            <button type="submit" value="Movies" class="search-button-smaller movie"/>Movies</button>
+                            <button type="submit" value="Shows" class="search-button-smaller show"/>Shows</button>
+                            <button type="submit" value="Books" class="search-button-smaller book"/>Books</button>
+                            <button type="submit" value="Authors" class="search-button-smaller author"/>Authors</button>
+                            <button type="submit" value="Music" class="search-button-smaller music"/>Music</button>
+                            <button type="submit" value="Games" class="search-button-smaller game"/>Games</button>
+                            <button type="submit" value="All" class="search-button-smaller all"/>All Categories</button>
+                            <button type="button" class="js-return-home-button return-home-button-smaller">Home</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="no-refined-results hide">
+                <div class="row">
+                    <div class="col-12 no-results-language">
+                        <h2>Sorry, there are no <span class="no-type-result"></span> for the search term <span class="no-term-result"></span>!</h2>
+                        <p>Try a different category or click home to redefine your search!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="results-container">
+                <div class="row">
+                    <div class="col-4">
+                        <button type="button" class="prev-button">Go Back To Confirmation Page</button>
+                        <div class="result-list"></div>
+                        <div class="col-12">
+                            <button type="button" disabled class="go-back-to-prior-page-of-results result-button next-prev">Previous Page</button>
+                            <button type="button" class="more-results smaller result-button next-prev">Next Page</button>
+                        </div>
+                        <div class="col-12">
+                            <div class="page-number"></div>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="info-container hide"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-      <script src="app.js"></script>
-  </body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="app.js"></script>
+    </body>
 </html>

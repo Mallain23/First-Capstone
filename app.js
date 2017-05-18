@@ -59,7 +59,10 @@ let state = {
   const resetState = (typeOfInterest) => {
       state.wikiPicsForResults = [];
       state.type = typeOfInterest === all ? null : typeOfInterest.toLowerCase();
+
+      addAndRemoveClasses([classReferences.iFrame], [classReferences.thumbs, classReferences.youtube_channel_links, classReferences.more])
       sliceIndex = 0;
+
       $(window).scrollTop(0)
 };
 
@@ -120,9 +123,9 @@ const getDataFromTasteDiveApi = (searchFor, searchType, callback) => {
 
 const getFormatedHtmlForYouTubeResults = ele => {
     return (
-          `<img class="thumbs" src="${ele.snippet.thumbnails.medium.url}">
+          `<img class="thumbs" src="${ele.snippet.thumbnails.default.url}">
            <div class="iFrame hide">
-              <iframe width="250px" height="300px" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
+              <iframe class="iFrame-box" width="250px" height="200px" src="http://www.youtube.com/embed/${ele.id.videoId}"  frameborder="0" allowfullscreen></iframe><br>
               <button type="button" class="back">Back</button>
            </div>
            <p class="channel">
@@ -133,7 +136,7 @@ const getFormatedHtmlForYouTubeResults = ele => {
 
 const displayYouTubeData = data => {
     assignNewPageTokens(data);
-
+    console.log(data)
     if (!data.items) {
         $('.youtube-video-results').append("No Results");
         return;
@@ -279,7 +282,7 @@ const formatedResultInfoHtml = (infoObj) => {
                 <a class="info-link" href="${infoObj.wUrl}">Read More</a>
             </div>
             <div class="iFrame">
-                <iframe class="iFrame-box" width="350" height="250" src="http://www.youtube.com/embed/${infoObj.yID}"  frameborder="0" allowfullscreen></iframe>
+                <iframe class="iFrame-box" width="300" height="250" src="http://www.youtube.com/embed/${infoObj.yID}"  frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="info-buttons-container">
                 <button type="button" class="back-to-result-list info-buttons">Go back to more like ${state.searchQuery}!</button>
@@ -326,7 +329,6 @@ const watchForSearchClick = () => {
         resetState(typeOfInterest)
         resetConfirmationPageResults()
 
-
         state.searchQuery = $(".search-field").val();
 
         getDataFromTasteDiveApi(state.searchQuery, state.type, displayTasteDiveData);
@@ -337,7 +339,7 @@ const watchForSearchClick = () => {
 
 
 const watchForRefinedSearchClick = () => {
-    $('.js-new-search-form').on("click", ".search-button", event => {
+    $('.js-new-search-form').on("click", ".search-button-smaller", event => {
         event.preventDefault();
 
         addAndRemoveClasses([classReferences.info_container], [classReferences.more_results, classReferences.result_button, classReferences.page_number, classReferences.prev_button])
@@ -468,6 +470,7 @@ const watchForPriorResultsClick = () => {
     });
 };
 
+
 const init = () => {
     watchForSearchClick();
     watchForRefinedSearchClick();
@@ -486,6 +489,7 @@ const init = () => {
 
     watchForNextResultsClick();
     watchForPriorResultsClick();
+
 }
 
 $(init);
