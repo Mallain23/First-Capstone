@@ -35,12 +35,9 @@ background-size: cover;
   text-align: center;
 }
 .style-search {
-  font-size: 8px;
+  font-size: 12px;
   border: 1px solid black;
   font-family: Open Sans;
-  width: 100%;
-  height: 16px;
-  margin-top: 15px;
 
 }
 
@@ -62,9 +59,7 @@ background-size: cover;
 }
 
 .info-summary {
-
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 20px;
   font-family: Open Sans;
   font-size: 16px;
   color: black;
@@ -122,11 +117,25 @@ background-size: cover;
   padding: 8px;
   cursor: pointer;
   margin-top: 30px;
-  width: 100%;
+  /*width: 100%;*/
 }
 
-
-.search-button-smaller, .prev-button.smaller, .return-home-button-smaller {
+.return-home-button-smaller {
+  font-size: 16px;
+  padding: 11px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: none;
+  background-color: transparent;
+  transition-duration: 1s;
+  margin-top: 10px;
+  cursor: pointer;
+  border: 1px solid black;
+  color: white;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+}
+.search-button-smaller, .prev-button.smaller {
   font-size: 16px;
   padding: 10px;
   margin-left: 5px;
@@ -156,7 +165,6 @@ background-size: cover;
   font-size: 16px;
 
 }
-
 
 .conf-buttons {
   background-color: white;
@@ -294,7 +302,7 @@ background-size: cover;
   margin-right: auto;
   margin-top: 10px;
   margin-bottom: 30px;
-  width: 100%;
+
 }
 
 .results {
@@ -326,9 +334,7 @@ background-size: cover;
   height: 250px;
   overflow: scroll;
   margin-top: 20px;
-  padding-bottom: 25px;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 20px;
 }
 
 
@@ -359,24 +365,23 @@ background-size: cover;
   float: right;
   background-color: white;
   border: 1px solid black;
-  padding: 10px;
+  padding: 15px;
   text-align: center;
 }
   .result-list {
     padding: 15px;
     height: 500px;
     overflow: scroll;
-    padding-left: 35px;
-    padding-top: 30px;
+    padding: 30px;
     margin-bottom: 20px;
     border: 1px solid black;
-    background-color: transparent;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: white;
     text-align: left;
     margin-top: 20px;
-    color: white;
+    color: black;
+    text-align: center;
   }
+
 
 .no-results-language, .no-results {
   border: 1px solid black;
@@ -456,12 +461,6 @@ background-size: cover;
   }
 
 
-.result-list {
-  width: 100%;
-  height: 535px;
-  background-color: white;
- color: black;
-}
 
 
   .result-thumbs:hover {
@@ -476,7 +475,7 @@ background-size: cover;
   }
 
   .prev-button, .result-list, .page-number, .next-prev {
-    margin-left: 25px;
+    margin-left: 8px;
   }
 
   .info-image, .headers, .info-summary, .button-container {
@@ -485,7 +484,11 @@ background-size: cover;
 
   .style-search {
     font-size: 16px;
-  }
 
   }
+.center-row {
+  text-align: center;
+}
+
+
 }

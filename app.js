@@ -173,7 +173,7 @@ const displayInfoCode = data => {
         $(".info-image").attr("src", `${state.confirmationpage_wiki_info.thumbnail.source}`)
     }
     else {
-      $(".info-image").attr("src", "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRtehRUbA2IoixzvtZaGM2ZWLZbNHYaFjH77t_1aS3cleGTQxEwM-ZmiA")
+      $(".info-image").attr("src", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsdoM_MhvhkSVJlXUhvLQ1GpIs9wKHm3x9JMw0IM6ffoKPbPYa")
   }
 
   $(".info-summary").prepend(`${wTeaser} `);
@@ -221,7 +221,7 @@ const makeASecondCallToWiki = () => {
 const updateResults = (ele, index, sliceIndex) => {
     if(!ele.thumbnail) {
         return (
-                `<img class="result-thumbs" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTs-hzO2hxD25PjrZLH_5zFbZ8qIkTUIOvW4pC21_0BLFLeUnXs5G2LLQ" data-index="${(sliceIndex * 5) + index}">
+                `<img class="result-thumbs" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsdoM_MhvhkSVJlXUhvLQ1GpIs9wKHm3x9JMw0IM6ffoKPbPYa" data-index="${(sliceIndex * 5) + index}">
                 <p class="results">${ele.title.toUpperCase()}</p>`
                );
     }
